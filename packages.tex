@@ -1,0 +1,48 @@
+% figure package
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{picture}
+% math packages
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{enumitem} % label enumerate
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+% change Q.D.E symbol
+\renewcommand\qedsymbol{$\hfill \mbox{\raggedright \rule{0.1in}{0.2in}}$}
+% environment and layout packages
+\usepackage[breaklinks=true,bookmarks=false,colorlinks,linkcolor=black]{hyperref}
+\usepackage{framed}
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2.5cm,bottom=3.5cm}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\lstset{%
+language=Matlab,%
+frame=single,%
+numbers=left,%
+stringstyle=\ttfamily,%
+keepspaces=true,%
+tabsize=4,%
+basicstyle=\ttfamily
+}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{color}
+\usepackage{xcolor}
+% table packages
+\usepackage{booktabs}
+% font packages
+% \usepackage{times}
+\usepackage[LGR,T1]{fontenc}
+\newcommand{\textgreek}[1]{\begingroup\fontencoding{LGR}\selectfont#1\endgroup}
+% Set up paragraph
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
