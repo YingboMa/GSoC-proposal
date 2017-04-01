@@ -1,48 +1,269 @@
-% figure package
-\usepackage{epsfig}
+\usepackage[margin=.75 in]{geometry}
+\usepackage{physics,esint,amssymb}
+\usepackage{floatrow}
+\usepackage{minted}
 \usepackage{graphicx}
-\usepackage{pdfpages}
-\usepackage{picture}
-% math packages
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{mathrsfs}
-\usepackage{enumitem} % label enumerate
-\newtheorem{theorem}{Theorem}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
-\theoremstyle{remark}
-\newtheorem*{remark}{Remark}
-% change Q.D.E symbol
-\renewcommand\qedsymbol{$\hfill \mbox{\raggedright \rule{0.1in}{0.2in}}$}
-% environment and layout packages
-\usepackage[breaklinks=true,bookmarks=false,colorlinks,linkcolor=black]{hyperref}
-\usepackage{framed}
-\usepackage{geometry}
-\geometry{left=2cm,right=2cm,top=2.5cm,bottom=3.5cm}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{listings}
-\lstset{%
-language=Matlab,%
-frame=single,%
-numbers=left,%
-stringstyle=\ttfamily,%
-keepspaces=true,%
-tabsize=4,%
-basicstyle=\ttfamily
+\graphicspath{ {images/} }
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
 }
-\usepackage{indentfirst}
-\usepackage{float}
+ 
+\urlstyle{same}
+\usepackage{natbib}
+\usepackage[T1]{fontenc}
+\usepackage{beramono}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+%%
+%% Julia definition (c) 2014 Jubobs
+%%
+\lstdefinelanguage{Julia}%
+  {morekeywords={    exit,whos,edit,load,is,isa,isequal,typeof,tuple,ntuple,uid,hash,finalizer,convert,promote,
+    subtype,typemin,typemax,realmin,realmax,sizeof,eps,promote_type,method_exists,applicable,
+    invoke,dlopen,dlsym,system,error,throw,assert,new,Inf,Nan,pi,im,begin,while,for,in,return,
+    break,continue,macro,quote,let,if,elseif,else,try,catch,end,bitstype,ccall,do,using,module,
+    import,export,importall,baremodule,immutable,local,global,const,Bool,Int,Int8,Int16,Int32,
+    Int64,Uint,Uint8,Uint16,Uint32,Uint64,Float32,Float64,Complex64,Complex128,Any,Nothing,None,
+    function,type,typealias,abstract},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+     morestring=[b]',
+  morestring=[b]" 
+}[keywords,comments,strings]%
+
+
+
+\lstset{%
+    language         = Julia,
+    basicstyle       = \ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{Maroon},
+    commentstyle     = \color{OliveGreen},
+    showstringspaces = false,
+    basicstyle=\ttfamily, 
+    columns=fullflexible, % make sure to use fixed-width font, CM typewriter is NOT fixed width
+    numbers=left, 
+    numberstyle=\small\ttfamily\color{Gray},
+    stepnumber=1,              
+    numbersep=10pt, 
+    numberfirstline=true, 
+    numberblanklines=true, 
+    tabsize=4,
+    lineskip=-1.5pt,
+    extendedchars=true,
+    numberstyle=\small\ttfamily\color{Gray},
+    breaklines=true,        
+    keywordstyle=\color{Blue}\bfseries,
+}
+
+\usepackage{inconsolata} % very nice fixed-width font included with texlive-full
+
+
+%\setlength{\oddsidemargin}{-.1 in}
+%\setlength{\evensidemargin}{-.3 in}
+%\setlength{\evensidemargin}{.0 in}
+%\addtolength{\topmargin}{-1in}
+%\setlength{\textwidth}{6.5in}
+%\setlength{\textheight}{8in}
+
+%
+% this command enables to remove a whole part of the text 
+% from the printout
+% to use it just enter
+% \remove{  
+% before the text to be excluded and
+% } 
+% after the text
+\newcommand{\remove}[1]{}
+
+%
+% The following macros are used to generate nice code for programs.
+% See example on how to use it below
+%
+
+
+%%%%%%%%%%%%%%%%%%%%% program macros %%%%%%%%%%%%%%%%%
+\usepackage{listings}
 \usepackage{color}
-\usepackage{xcolor}
-% table packages
-\usepackage{booktabs}
-% font packages
-% \usepackage{times}
-\usepackage[LGR,T1]{fontenc}
-\newcommand{\textgreek}[1]{\begingroup\fontencoding{LGR}\selectfont#1\endgroup}
-% Set up paragraph
-\setcounter{tocdepth}{4}
-\setcounter{secnumdepth}{4}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+
+\lstset{style=mystyle}
+
+
+%\newcommand{\Do}{{\small\bf do}\ }
+%\newcommand{\Return}{{\small\bf return\ }}
+%\newcommand{\Proc}[1]{#1\+}
+%\newcommand{\Returns}{{\small\bf returns}}
+%\newcommand{\Procbegin}{{\small\bf begin}}
+%\newcommand{\If}{{\small\bf if}\ \=\+}
+%\newcommand{\Then}{{\small\bf then}\ \=\+}
+%\newcommand{\Else}{\<{\small\bf else}\ \>}
+%\newcommand{\Elseif}{\<{\small\bf elseif}\ }
+%\newcommand{\Endif}{\<{\small\bf end\ if\ }\-\-}
+%\newcommand{\Endproc}[1]{{\small\bf end} #1\-}
+%\newcommand{\For}{{\small\bf for}\ \=\+}
+%\newcommand{\Endfor}{{\small\bf end\ for}\ \-}
+%\newcommand{\Loop}{{\bf loop}\ \= \+}
+%\newcommand{\Endloop}{{\bf end\ loop}\ \-}
+%\newenvironment{program}{
+%    \begin{minipage}{\textwidth}
+%    \begin{tabbing}
+%    \ \ \ \ \=\kill
+%  }{
+%    \end{tabbing}
+%    \end{minipage}
+%  }
+
+% a blank line
+\def\blankline{\hbox{}}
+
+%%%%%%%%%%%%%%%%%%%%% End of PROGRAM macros %%%%%%%%%%%%%%%%%
+
+
+%
+% The following macro is used to generate the header.
+%
+%
+
+\newcommand{\lecture}[5]{
+   %\pagestyle{headings}
+   \thispagestyle{plain}
+   \newpage
+  %\setcounter{chapter}{#1}
+   \setcounter{page}{#2}
+%  \set\thechapter{#3}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{
+    \hbox to 6.28in { {\bf MAT 425: Analysis III
+                        \hfill Spring Semester, 2016} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Problem Set : #1 #3  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Instructor: #4 \hfill Student: #5} }
+      }
+   }
+   \end{center}
+   \markboth{Lecture #1: #3}{Lecture #1: #3}
+   \vspace*{4mm}
+}
+
+%
+% Use these macros for organizing sections of your notes.
+% Each command takes two arguments: (1) the title of the section and and
+% (2) a keyword for that section to appear in the index.  (See examples.)
+% Please don't use \section, \subsection, and \subsubsection directly!
+%
+
+\newcommand{\topic}[2]{\section{#1} \index{#2} \markright{#1}}
+\newcommand{\subtopic}[2]{\subsection{#1} \index{#2}}
+\newcommand{\subsubtopic}[2]{\subsubsection{#1} \index{#2}}
+ 
+%
+% Convention for citations is first author's last name followed by other
+% authors' last initials, followed by the year.  For example, to cite the
+% seventh entry in the course bibliography, you would type: \citet{BurnsL80}
+% (To avoid bibliography problems, for now we redefine the \cite command.)
+%
+     
+\renewcommand{\cite}[1]{[#1]}
+
+
+%
+% Use these for theorems, lemmas, proofs, etc.
+%
+
+
+%\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{problem}[theorem]{Problem}
+
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\qed}{\hfill $\Box$}
+\newenvironment{proof}{\par{\bf Proof:}}{\qed \par}
+%\newenvironment{proof}{{\em Proof:}}{\hfill\rule{2mm}{2mm}}
+\newtheorem{definition}[theorem]{Definition}
+
+%
+% Use the following for definitions.
+% \bigdef is for definitions to be set off by themselves; \smalldef is for
+% definitions given in the middle of a paragraph.
+%
+\newenvironment{dfn}{{\vspace*{1ex} \noindent \bf Definition }}{\vspace*{1ex}}
+\newcommand{\bigdef}[2]{\index{#1}\begin{dfn} {\rm #2} \end{dfn}}
+\newcommand{\smalldef}[1]{\index{#1} {\em #1}}
+%%%%%%%%%%%%%%%%%%%%% math macros %%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\newcommand{\ep}{\epsilon}
+\newcommand{\al}{\alpha}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rd}{{\mathbb{R}^{d}}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Zp}{\mathbb{Z}_+}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\Os}{\mathcal{O}}
+\newcommand{\Hs}{\mathcal{H}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Lone}{{L^1(\R^d)}}
+\newcommand{\Ltwo}{{L^2(\R^d)}}
+
+\newcommand{\ltwo}{{\ell^2(\Z)}}
+
+\newcommand{\fund}[1]{\pi(#1,x_0)}
+\newcommand{\0}{\mathbf{0}}
+\newcommand{\me}[2][E]{m_{*}({#2})}
+\newcommand{\Nm}{\mathcal{N}}
+\newcommand{\can}{\mathcal{C}}
+
+\newcommand*\BF[1]{\mathbf{#1}}
+\newcommand*\dif{\mathop{}\!\mathrm{d}}
+
+\def\keywords{\vspace{.5em}
+{\textit{Keywords}:\,\relax%
+}}
+\def\endkeywords{\par}

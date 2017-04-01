@@ -3,7 +3,10 @@
 \input{packages.tex}
 \author{Yingbo Ma}
 \title{Native Julia Solvers for Ordinary Differential Equations Boundary Value Problem: A GSoC proposal}
+
 \begin{document}
+\nocite{*}
+\maketitle
 \maketitle
 \tableofcontents
 
@@ -22,23 +25,21 @@ and its derivatives, and an $n$th order ODE can be written as
 
 \[F(x, y, y', \cdots, y^{(n)}) = 0\].
 
-Physics and engineering often raise ODE problems. Many physics phenomenon can be reduced into a
-ODE. Newton's second law of motion, namely $F=ma$ can rewrite into a ODE as $m\frac{d^2x}{dt^2}
-=F(x)$, since $a$ can depend on time. ODEs can be really hard to solve. There are many case that
-a ODE does not have an analytical solution. Therefore, numerical methods need to be used to solve
+Physics and engineering often present ODE problems. Many physics phenomena in physics can be reduced into an ODE. Newton's second law of motion, namely $F=ma$ can be rewritten into an ODE as $m\frac{d^2x}{dt^2}
+=F(x)$, since $a$ can depend on time. ODEs can be very difficult to solve. There are many case in which an ODE does not have an analytical solution. Therefore, numerical methods need to be used to solve
 ODEs, by approximating the solution. There are two kinds of problems in ODE. One is initial
 value problem (IVP) and the other is boundary value problem (BVP). For instance, the ODE
 \[m\frac{d^2x}{dt^2} = -kx(t)\]
 describes the motion for a harmonic oscillator. If the initial position $x_0$ and initial velocity
 $\frac{dx_0}{dt}$ is known, then it is an IVP problem. If the condition at the ``boundary'' is know,
 for instance, initial position $x_0$ and final position $x_1$, then it is a BVP problem. The solvers
-that I am going to work on solves BVP problem.
+that I am going to work on with solvers for BVP problem.
 % subsection basic_concepts_for_nonexperts (end)
 
 \subsubsection{Introduction} % (fold)
 \label{ssub:introduction}
-The project that I propose to work in Google's Summer of Code project is the native Julia implementation
-of some BVP solving methods for ODE, namely, collocation method and shooting method.
+The project that I propose to work on in Google's Summer of Code project is the native Julia
+implementation of some BVP solving methods for ODE, namely, collocation method and shooting method.
 % subsubsection introduction (end)
 
 \subsection{Project Goals}
@@ -55,8 +56,51 @@ It can be defined by
 
 \[\text{prob} = \text{BVProblem}(f,domin,bc)\].
 
-\subsubsection{Goal 2: Implement shooting method}
+\begin{lstlisting}[mathescape=true]
+abstract AbstractBVProblem{dType,bType,isinplace,F} <: DEProblem
 
+type BVProblem{dType,bType,initType,F} <: AbstractBVProblem{dType,bType,F}
+  f::F
+  domin::dType
+  bc::bType
+  init::initType
+end
+
+function BVProblem(f,domin,bc,init=nothing)
+  BVProblem{eltype(domin),eltype(bc),eltype(init),typeof(f)}(f,domin,bc,init)
+end
+
+\end{lstlisting}
+
+
+\subsubsection{Goal 2: Implement shooting method}
+The shooting method is a method that convert a BVP problem into an IVP problem and a root finding
+problem. Generally, the shooting method is efficient in simple problems, because it does not need
+a discretization matrix. This is no memory overhead. The drawback is that even if the BVP problem
+is well-conditioned, the root finding problem that the BVP converted to can be ill-conditioned.
+Therefore, a more robust method like the collocation method is also need, despite shooting method
+is easy to implement.
+
+This is the my current implementation of the shooting method. I will work on to generalize it later,
+e.g. let user has the ability to input a ODE solver and a minimization algorithm.
+
+\begin{lstlisting}[mathescape=true]
+function solve(prob::BVProblem; OptSolver=LBFGS())
+  bc = prob.bc
+  u0 = bc[1]
+  len = length(bc[1])
+  probIt = ODEProblem(prob.f, u0, prob.domin)
+  function loss(minimizer)
+    probIt.u0 = minimizer
+    sol = DifferentialEquations.solve(probIt)
+    norm(sol[end]-bc[2])
+  end
+  opt = optimize(loss, u0, OptSolver)
+  probIt.u0 = opt.minimizer
+  @show opt.minimum
+  DifferentialEquations.solve(probIt)
+end
+\end{lstlisting}
 
 \subsubsection{Goal 3: Implement collocation method}
 
