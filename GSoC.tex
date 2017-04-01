@@ -103,7 +103,19 @@ end
 \end{lstlisting}
 
 \subsubsection{Goal 3: Implement collocation method}
+The collocation method is the idea that a solution $y(x)$ of a ODE $F(x, y, y', \cdots, y^{(n)}) = 0$
+can be approximated by a linear combination of basis functions.
 
+\[y(x) \approx \hat{y}(x) = \phi_0 + \sum_{i=1}^na_i\phi_i(x)\]
+
+And the residual $R(x,a)$ can be written as
+
+\[F(x, \hat{y}(x), \hat{y'}(x), \cdots, \hat{y}^{(n)}(x)) = R(x,a)\].
+
+Collocation method forces the residual $R(x,a)$ to be $0$ for $n$ collocation points.
+There are different discretization methods in collocation method, and I am going to work on
+Simpson discretization, Gauss discretization, Radau discretization, and Labatto
+discretization this summer.
 
 \subsection{Stretch Goals and Future Directions}
 
