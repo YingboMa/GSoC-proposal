@@ -3,9 +3,8 @@
 \input{packages.tex}
 \author{Yingbo Ma}
 \title{Native Julia Solvers for Ordinary Differential Equations Boundary Value Problem: A GSoC proposal}
-
 \begin{document}
-\nocite{*}
+% \nocite{*}
 \maketitle
 \maketitle
 \tableofcontents
@@ -114,12 +113,66 @@ And the residual $R(x,a)$ can be written as
 
 Collocation method forces the residual $R(x,a)$ to be $0$ for $n$ collocation points.
 There are different discretization methods in collocation method, and I am going to work on
-Simpson discretization, Gauss discretization, Radau discretization, and Labatto
-discretization this summer.
+Simpson discretization, Gauss discretization, Radau discretization, and Lobatto
+discretization this summer. The ``discretization'' is really a matrix $A$ that applies different
+quadrature rules e.g. Simpson's rule to a vector $\vec{x}$. It forms a sparse linear system
+$A\vec{x}=\vec{b}$ where $\vec{b}$ is known by the boundary condition and RHS of the ODE.
+
+A quadrature rules is a numeric method to calculate a well-behaved define integral (no singularity).
+It uses the idea that a function $f(x)$ can be represented by multiplying orthogonal polynomial $P(x)$
+and another function $W(x)$.
+
+\[f(x) = P(x)\cdot W(x)\]
+
+Therefore, a define integral of function $F$ can be approximated by a linear combination of orthogonal
+polynomials $p_i$ and their weights $w_i$.
+
+\[F = \int_{a}^{b}f(x)\;dx = \int_{a}^{b}P(x)W(x) \approx \sum_{i=1}^{n}p_i(x)\cdot w_i(x)\;dx\]
+
+\subsection{Simpson Quadrature}
+Simpson's rule is a three-point Newton-Cotes quadrature rule. Its formula is
+\[\int _{a}^{b}f(x)\,dx\approx {\tfrac {b-a}{6}}\left[f(a)+4f\left({\tfrac {a+b}{2}}\right)+f(b)\right].
+\cite{simpson}\]
+
+The error for the Simpson's rule is
+
+\[{\frac{1}{90}}\left({\frac{b-a}{2}}\right)^{5}\left|f^{{(4)}}(\xi )\right|,\]
+
+where the $\xi \in (a, b)$ by Lagrange error bound. \cite{simp}
+
+Simpson's 3/8 rule is
+
+\[\int _{a}^{b}f(x)\,dx\approx {\tfrac {3h}{8}}\left[f(x_{0})+3f(x_{1})+3f(x_{2})+
+2f(x_{3})+3f(x_{4})+3f(x_{5})+2f(x_{6})+...+f(x_{n})\right], \cite{simp38}\]
+
+where $h=(b-a)/h$ and $x_i = a+ih$.
+
+\subsection{Gauss–Legendre quadrature}
+The Gauss–Legendre quadrature's weight is
+
+\[w_{i}={\frac {2}{\left(1-x_{i}^{2}\right)[P'_{n}(x_{i})]^{2}}}=
+\frac{2\left(1-x_{i}^2\right)}{\left((n+1)\right)^2[P_{n+1}(x_{i})]^{2}} \cite{gauss}\]
+
+\subsection{Lobatto Quadrature}
+The Lobatto quadrature on the interval $[-1,1]$ is
+
+\[\int _{-1}^{1}{f(x)\,dx} = \frac{2}{n(n-1)}[f(1)+f(-1)] + \sum _{i=2}^{n-1}{w_{i}f(x_{i})}+R_{n},
+\cite{lobatto}\]
+
+with the weights
+
+\[w_{i}={\frac {2}{n(n-1)[P_{n-1}(x_{i})]^{2}}},\qquad x_{i}\neq \pm 1. \cite{lobatto}\]
+
+$P_n$ is the $n$th order Legendre polynomial, and it can be written as
+
+\[P_{n}(x)=2^{n} \cdot \sum _{k=0}^{n}x^{k}\binom{n}{k}\binom{{\frac {n+k-1}{2}}}{n}.\]
 
 \subsection{Stretch Goals and Future Directions}
 The stretch goals for this summer would be add tests for collection method and shooting method, to
-make general recommendation for helping users to choose solvers.
+make general recommendation for helping users to choose solvers. Also, I want to implement the weighted
+residual method. Unlike the collocation method forces the residual to be zero at a finite number
+of collection points the weighted residual method minimize the residual over the entire interval of
+integration.
 
 \subsection{Timeline}
 \paragraph{Pre-GSoC} % (fold)
@@ -163,33 +216,30 @@ I don't have much time to work on the GSoC project until it starts.
 \end{itemize}
 % paragraph discretization_algorithms (end)
 
-\paragraph{Least Squares Collocation Method: July 10 - July 31} % (fold)
+\paragraph{Collocation Method: July 10 - July 31} % (fold)
 \label{par:least_squares_method_july_10_july_31}
 \begin{itemize}
-	\item Implement the least squares collocation method.
-	\item Add more sophisticated testing BVP problems to test against the least squares
-	collocation method.
-	\item Optimize the least squares collocation method.
+	\item Implement the collocation method.
+	\item Add more sophisticated testing BVP problems to test against the collocation method.
+	\item Optimize the collocation method.
 	\item Send a PR.
 \end{itemize}
 % paragraph least_squares_method_july_10_july_31 (end)
 
-\paragraph{Weighted Residual Method: July 31 - August 15} % (fold)
+\paragraph{Documentation: July 31 - August 15} % (fold)
 \label{par:weighted_residual_method_july_31_august_15}
 \begin{itemize}
-	\item Implement the weighted residual method.
-	\item Test weighted residual method, and add more tests to test against the weighted
-	residual method.
-	\item Optimize the weighted residual method.
+	\item Write a documentation page for the BVP solvers that I have written.
+	\item Add more tests for BVP problem and tune the algorithm.
 	\item Send a PR.
 \end{itemize}
 % paragraph weighted_residual_method_july_31_august_15 (end)
 
-\paragraph{Documentation \& Review \& Stretch Goals: August 15 - August 29 (End)} % (fold)
+\paragraph{Review \& Stretch Goals: August 15 - August 29 (End)} % (fold)
 \label{par:review_&_stretch_goals_august_15_august_29}
 \begin{itemize}
-	\item Write a documentation page for the BVP solvers that I have written.
-	\item Start to work on the Stretch Goals.
+	% \item Write a documentation page for the BVP solvers that I have written.
+	\item Start to work on the stretch goals.
 	\item Send a PR.
 	\item Review and test all the code that I have written in GSoC project.
 \end{itemize}
@@ -214,7 +264,7 @@ My mentor will be Christopher Rackauckas.
 
 \subsection{Julia Coding Demo} % (fold)
 \label{ssub:julia_coding_demo}
-Here are my code my in Julia.
+Here are my code that is written in Julia.
 
 \url{https://github.com/JuliaDiffEq/BoundaryValueDiffEq.jl}
 

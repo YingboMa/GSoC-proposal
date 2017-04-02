@@ -1,5 +1,5 @@
 \usepackage[margin=.75 in]{geometry}
-\usepackage{physics,esint,amssymb}
+\usepackage{physics,esint,amssymb,amsmath}
 \usepackage{floatrow}
 \usepackage{minted}
 \usepackage{graphicx}
@@ -14,7 +14,10 @@
 }
  
 \urlstyle{same}
-\usepackage{natbib}
+% \usepackage{natbib}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[nottoc]{tocbibind}
 \usepackage[T1]{fontenc}
 \usepackage{beramono}
 \usepackage{listings}
@@ -84,7 +87,7 @@
 % before the text to be excluded and
 % } 
 % after the text
-\newcommand{\remove}[1]{}
+% \newcommand{\remove}[1]{}
 
 %
 % The following macros are used to generate nice code for programs.
@@ -149,7 +152,7 @@
 %  }
 
 % a blank line
-\def\blankline{\hbox{}}
+% \def\blankline{\hbox{}}
 
 %%%%%%%%%%%%%%%%%%%%% End of PROGRAM macros %%%%%%%%%%%%%%%%%
 
@@ -159,29 +162,29 @@
 %
 %
 
-\newcommand{\lecture}[5]{
-   %\pagestyle{headings}
-   \thispagestyle{plain}
-   \newpage
-  %\setcounter{chapter}{#1}
-   \setcounter{page}{#2}
-%  \set\thechapter{#3}
-   \noindent
-   \begin{center}
-   \framebox{
-      \vbox{
-    \hbox to 6.28in { {\bf MAT 425: Analysis III
-                        \hfill Spring Semester, 2016} }
-       \vspace{4mm}
-       \hbox to 6.28in { {\Large \hfill Problem Set : #1 #3  \hfill} }
-       \vspace{2mm}
-       \hbox to 6.28in { {\it Instructor: #4 \hfill Student: #5} }
-      }
-   }
-   \end{center}
-   \markboth{Lecture #1: #3}{Lecture #1: #3}
-   \vspace*{4mm}
-}
+% \newcommand{\lecture}[5]{
+%    %\pagestyle{headings}
+%    \thispagestyle{plain}
+%    \newpage
+%   %\setcounter{chapter}{#1}
+%    \setcounter{page}{#2}
+% %  \set\thechapter{#3}
+%    \noindent
+%    \begin{center}
+%    \framebox{
+%       \vbox{
+%     \hbox to 6.28in { {\bf MAT 425: Analysis III
+%                         \hfill Spring Semester, 2016} }
+%        \vspace{4mm}
+%        \hbox to 6.28in { {\Large \hfill Problem Set : #1 #3  \hfill} }
+%        \vspace{2mm}
+%        \hbox to 6.28in { {\it Instructor: #4 \hfill Student: #5} }
+%       }
+%    }
+%    \end{center}
+%    \markboth{Lecture #1: #3}{Lecture #1: #3}
+%    \vspace*{4mm}
+% }
 
 %
 % Use these macros for organizing sections of your notes.
@@ -190,9 +193,9 @@
 % Please don't use \section, \subsection, and \subsubsection directly!
 %
 
-\newcommand{\topic}[2]{\section{#1} \index{#2} \markright{#1}}
-\newcommand{\subtopic}[2]{\subsection{#1} \index{#2}}
-\newcommand{\subsubtopic}[2]{\subsubsection{#1} \index{#2}}
+% \newcommand{\topic}[2]{\section{#1} \index{#2} \markright{#1}}
+% \newcommand{\subtopic}[2]{\subsection{#1} \index{#2}}
+% \newcommand{\subsubtopic}[2]{\subsubsection{#1} \index{#2}}
  
 %
 % Convention for citations is first author's last name followed by other
@@ -201,7 +204,7 @@
 % (To avoid bibliography problems, for now we redefine the \cite command.)
 %
      
-\renewcommand{\cite}[1]{[#1]}
+% \renewcommand{\cite}[1]{[#1]}
 
 
 %
@@ -210,60 +213,60 @@
 
 
 %\newtheorem{theorem}{Theorem}[chapter]
-\newtheorem{theorem}{Theorem}
-\newtheorem{conjecture}[theorem]{Conjecture}
-\newtheorem{problem}[theorem]{Problem}
+% \newtheorem{theorem}{Theorem}
+% \newtheorem{conjecture}[theorem]{Conjecture}
+% \newtheorem{problem}[theorem]{Problem}
 
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{claim}[theorem]{Claim}
-\newtheorem{corollary}[theorem]{Corollary}
-\newcommand{\qed}{\hfill $\Box$}
-\newenvironment{proof}{\par{\bf Proof:}}{\qed \par}
-%\newenvironment{proof}{{\em Proof:}}{\hfill\rule{2mm}{2mm}}
-\newtheorem{definition}[theorem]{Definition}
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{claim}[theorem]{Claim}
+% \newtheorem{corollary}[theorem]{Corollary}
+% \newcommand{\qed}{\hfill $\Box$}
+% \newenvironment{proof}{\par{\bf Proof:}}{\qed \par}
+% %\newenvironment{proof}{{\em Proof:}}{\hfill\rule{2mm}{2mm}}
+% \newtheorem{definition}[theorem]{Definition}
 
-%
-% Use the following for definitions.
-% \bigdef is for definitions to be set off by themselves; \smalldef is for
-% definitions given in the middle of a paragraph.
-%
-\newenvironment{dfn}{{\vspace*{1ex} \noindent \bf Definition }}{\vspace*{1ex}}
-\newcommand{\bigdef}[2]{\index{#1}\begin{dfn} {\rm #2} \end{dfn}}
-\newcommand{\smalldef}[1]{\index{#1} {\em #1}}
-%%%%%%%%%%%%%%%%%%%%% math macros %%%%%%%%%%%%%%%%%
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
-\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+% %
+% % Use the following for definitions.
+% % \bigdef is for definitions to be set off by themselves; \smalldef is for
+% % definitions given in the middle of a paragraph.
+% %
+% \newenvironment{dfn}{{\vspace*{1ex} \noindent \bf Definition }}{\vspace*{1ex}}
+% \newcommand{\bigdef}[2]{\index{#1}\begin{dfn} {\rm #2} \end{dfn}}
+% \newcommand{\smalldef}[1]{\index{#1} {\em #1}}
+% %%%%%%%%%%%%%%%%%%%%% math macros %%%%%%%%%%%%%%%%%
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{mathtools}
+% \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+% \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
-\newcommand{\ep}{\epsilon}
-\newcommand{\al}{\alpha}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\Rd}{{\mathbb{R}^{d}}}
-\newcommand{\Z}{\mathbb{Z}}
-\newcommand{\Zp}{\mathbb{Z}_+}
-\newcommand{\C}{\mathbb{C}}
-\newcommand{\Q}{\mathbb{Q}}
-\newcommand{\D}{\mathbb{D}}
-\newcommand{\Os}{\mathcal{O}}
-\newcommand{\Hs}{\mathcal{H}}
-\newcommand{\N}{\mathbb{N}}
-\newcommand{\Lone}{{L^1(\R^d)}}
-\newcommand{\Ltwo}{{L^2(\R^d)}}
+% \newcommand{\ep}{\epsilon}
+% \newcommand{\al}{\alpha}
+% \newcommand{\R}{\mathbb{R}}
+% \newcommand{\Rd}{{\mathbb{R}^{d}}}
+% \newcommand{\Z}{\mathbb{Z}}
+% \newcommand{\Zp}{\mathbb{Z}_+}
+% \newcommand{\C}{\mathbb{C}}
+% \newcommand{\Q}{\mathbb{Q}}
+% \newcommand{\D}{\mathbb{D}}
+% \newcommand{\Os}{\mathcal{O}}
+% \newcommand{\Hs}{\mathcal{H}}
+% \newcommand{\N}{\mathbb{N}}
+% \newcommand{\Lone}{{L^1(\R^d)}}
+% \newcommand{\Ltwo}{{L^2(\R^d)}}
 
-\newcommand{\ltwo}{{\ell^2(\Z)}}
+% \newcommand{\ltwo}{{\ell^2(\Z)}}
 
-\newcommand{\fund}[1]{\pi(#1,x_0)}
-\newcommand{\0}{\mathbf{0}}
-\newcommand{\me}[2][E]{m_{*}({#2})}
-\newcommand{\Nm}{\mathcal{N}}
-\newcommand{\can}{\mathcal{C}}
+% \newcommand{\fund}[1]{\pi(#1,x_0)}
+% \newcommand{\0}{\mathbf{0}}
+% \newcommand{\me}[2][E]{m_{*}({#2})}
+% \newcommand{\Nm}{\mathcal{N}}
+% \newcommand{\can}{\mathcal{C}}
 
-\newcommand*\BF[1]{\mathbf{#1}}
-\newcommand*\dif{\mathop{}\!\mathrm{d}}
+% \newcommand*\BF[1]{\mathbf{#1}}
+% \newcommand*\dif{\mathop{}\!\mathrm{d}}
 
-\def\keywords{\vspace{.5em}
-{\textit{Keywords}:\,\relax%
-}}
-\def\endkeywords{\par}
+% \def\keywords{\vspace{.5em}
+% {\textit{Keywords}:\,\relax%
+% }}
+% \def\endkeywords{\par}
