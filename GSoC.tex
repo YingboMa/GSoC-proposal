@@ -1,45 +1,54 @@
 % main.tex
-\documentclass[a4paper,12pt,onecolumn]{article}
+\documentclass[a4paper,11pt,onecolumn]{article}
 \input{packages.tex}
 \author{Yingbo Ma}
 \title{Native Julia Solvers for Ordinary Differential Equations Boundary Value Problem: A GSoC proposal}
 
 \begin{document}
-\nocite{*}
+% \nocite{*}
 \maketitle
-\maketitle
+% \maketitle
 \tableofcontents
 
-\section{Synopsis} % (fold)
-\label{sec:synopsis}
+% \section{Synopsis} % (fold)
+% \label{sec:synopsis}
 
-% section synopsis (end)
+% % section synopsis (end)
 
 \section{The Project} % (fold)
 \label{sec:the_project}
 
 \subsection{Basic concepts for nonexperts} % (fold)
 \label{sub:basic_concepts_for_nonexperts}
-An ordinary differential equation (ODE)  is an equality relationship between a function $y(x)$
+An ordinary differential equation (ODE) is an equality relationship between a function $y(x)$
 and its derivatives, and an $n$th order ODE can be written as
 
-\[F(x, y, y', \cdots, y^{(n)}) = 0\].
+\[F(x, y, y', \cdots, y^{(n)}) = 0.\]
+Almost every branch of science often presents ODE problems. Many physical phenomenas can be reduced
+into an ODE. Newton's second law of motion, namely, $F=ma$ can be rewritten into an ODE as $m\frac{
+d^2x}{dt^2}=F(x)$, since $a$ can depend on time. ODEs can be very difficult to solve. There are
+many cases in which an ODE does not have an analytical solution. Therefore, numerical methods need
+to be used to solve ODEs by approximating the solution. There are two kinds of ODE problems. One 
+is the initial value problem (IVP) and the other is the boundary value problem (BVP). For instance, the ODE
 
-Physics and engineering often present ODE problems. Many physics phenomena in physics can be reduced into an ODE. Newton's second law of motion, namely $F=ma$ can be rewritten into an ODE as $m\frac{d^2x}{dt^2}
-=F(x)$, since $a$ can depend on time. ODEs can be very difficult to solve. There are many case in which an ODE does not have an analytical solution. Therefore, numerical methods need to be used to solve
-ODEs, by approximating the solution. There are two kinds of problems in ODE. One is initial
-value problem (IVP) and the other is boundary value problem (BVP). For instance, the ODE
 \[m\frac{d^2x}{dt^2} = -kx(t)\]
+
 describes the motion for a harmonic oscillator. If the initial position $x_0$ and initial velocity
-$\frac{dx_0}{dt}$ is known, then it is an IVP problem. If the condition at the ``boundary'' is know,
-for instance, initial position $x_0$ and final position $x_1$, then it is a BVP problem. The solvers
-that I am going to work on with solvers for BVP problem.
+$\frac{dx_0}{dt}$ are known, then it is an IVP problem. If the condition at the ``boundary'' is 
+known, for instance, the initial position $x_0$ and final position $x_1$, then it is a BVP problem. My
+proposal is for the development of efficient and general-purpose BVP solvers for the Julia
+ecosystem.
 % subsection basic_concepts_for_nonexperts (end)
 
 \subsubsection{Introduction} % (fold)
 \label{ssub:introduction}
 The project that I propose to work on in Google's Summer of Code project is the native Julia
-implementation of some BVP solving methods for ODE, namely, collocation method and shooting method.
+implementation of some BVP solving methods for ODE, namely, the collocation method and the shooting method.
+There is no solver for solving ODE BVP problems yet in the \textit{JuliaDiffEq} organization. There
+are a number of advantages for Julia native solvers over calling C or Fortran's existing libraries
+via Julia's FFI, including the ability to use a wide variety of types like \textit{BigFloat} for arbitrary
+precision, easier for people to contribute and better integrate with other packages in Julia
+ecosystem.
 % subsubsection introduction (end)
 
 \subsection{Project Goals}
@@ -48,48 +57,57 @@ A data structure to describe the BVP problem, namely, ``BVProblem''. It contains
 
 \begin{align*}
 	&F(x, y, y', \cdots, y^{(n)}) = 0 \\
-	&\text{domin: }x \in [a, b] \\
+	&\text{domain: }x \in [a, b] \\
 	&\text{boundary condition: Dirichlet, Neumann, Robin}.
 \end{align*}
 
-It can be defined by
+The data structure can be created by
 
-\[\text{prob} = \text{BVProblem}(f,domin,bc)\].
+\[\text{prob} = \text{BVProblem}(f,domain,bc)\].
 
 \begin{lstlisting}[mathescape=true]
 abstract AbstractBVProblem{dType,bType,isinplace,F} <: DEProblem
 
 type BVProblem{dType,bType,initType,F} <: AbstractBVProblem{dType,bType,F}
   f::F
-  domin::dType
-  bc::bType
+  domain::dType
+  bc::bType		#boundary condition
   init::initType
 end
 
-function BVProblem(f,domin,bc,init=nothing)
-  BVProblem{eltype(domin),eltype(bc),eltype(init),typeof(f)}(f,domin,bc,init)
+function BVProblem(f,domain,bc,init=nothing)
+  BVProblem{eltype(domain),eltype(bc),eltype(init),typeof(f)}(f,domain,bc,init)
 end
-
 \end{lstlisting}
 
+In addition, I need to add a data structure for boundary conditions, which let users to define a
+boundary condition easily. The following is a template:
+
+\begin{lstlisting}[mathescape=true]
+abstract AbstractBoundaryCondition
+
+type DirichletBC <: AbstractBoundaryCondition; end
+type NeumannBC <: AbstractBoundaryCondition; end
+type RobinBC <: AbstractBoundaryCondition; end
+\end{lstlisting}
 
 \subsubsection{Goal 2: Implement shooting method}
-The shooting method is a method that convert a BVP problem into an IVP problem and a root finding
-problem. Generally, the shooting method is efficient in simple problems, because it does not need
-a discretization matrix. This is no memory overhead. The drawback is that even if the BVP problem
+The shooting method is a method that converts a BVP problem into an IVP problem and a root finding
+problem. Generally, the shooting method is efficient in simple problems because it does not need
+a discretization matrix. This reduces the memory overhead. The drawback is that even if the BVP problem
 is well-conditioned, the root finding problem that the BVP converted to can be ill-conditioned.
-Therefore, a more robust method like the collocation method is also need, despite shooting method
-is easy to implement.
+Therefore, a more robust method like the collocation method is also needed, despite the fact that
+the shooting shooting method is easy to implement.
 
-This is the my current implementation of the shooting method. I will work on to generalize it later,
-e.g. let user has the ability to input a ODE solver and a minimization algorithm.
+This is my current implementation of the shooting method. I will work on it to generalize it
+later, e.g. let the user have the ability to input a ODE solver and a minimization algorithm.
 
 \begin{lstlisting}[mathescape=true]
 function solve(prob::BVProblem; OptSolver=LBFGS())
   bc = prob.bc
   u0 = bc[1]
   len = length(bc[1])
-  probIt = ODEProblem(prob.f, u0, prob.domin)
+  probIt = ODEProblem(prob.f, u0, prob.domain)
   function loss(minimizer)
     probIt.u0 = minimizer
     sol = DifferentialEquations.solve(probIt)
@@ -97,7 +115,7 @@ function solve(prob::BVProblem; OptSolver=LBFGS())
   end
   opt = optimize(loss, u0, OptSolver)
   probIt.u0 = opt.minimizer
-  @show opt.minimum
+  opt.minimum
   DifferentialEquations.solve(probIt)
 end
 \end{lstlisting}
@@ -114,21 +132,178 @@ And the residual $R(x,a)$ can be written as
 
 Collocation method forces the residual $R(x,a)$ to be $0$ for $n$ collocation points.
 There are different discretization methods in collocation method, and I am going to work on
-Simpson discretization, Gauss discretization, Radau discretization, and Labatto
-discretization this summer.
+Simpson discretization, Gauss discretization, Radau discretization, and Lobatto
+discretization this summer. The ``discretization'' is really a matrix $A$ that applies different
+quadrature rules, e.g. Simpson's rule to a vector $\vec{x}$. It forms a sparse linear system
+$A\vec{x}=\vec{b}$, where $\vec{b}$ is known by the boundary condition and RHS of the ODE.
+
+A quadrature rule is a numeric method to calculate a well-behaved definite integrals (no singularity).
+It uses the idea that a function $f(x)$ can be represented by multiplying an orthogonal polynomial $P(x)$
+and another function $W(x)$.
+
+\[f(x) = P(x)\cdot W(x)\]
+
+Therefore, a definite integral of a function $F$ can be approximated by a linear combination of orthogonal
+polynomials $p_i$ and their weights $w_i$.
+
+\[F = \int_{a}^{b}f(x)\;dx = \int_{a}^{b}P(x)W(x) \approx \sum_{i=1}^{n}p_i(x)\cdot w_i(x)\;dx\]
+
+There are more details about quadrature in the section \ref{sec:quadrature}.
 
 \subsection{Stretch Goals and Future Directions}
+\subsubsection{Compatibility with the features of the common interface}
+There are many features in \textit{JuliaDiffEq} common interface. They are listed in
+\url{http://docs.juliadiffeq.org/latest/basics/common_solver_opts.html}, and I plan to
+implement the following:
+\begin{itemize}
+	\item Continuous output
+	\item Singularity handling
+	\item \textit{Progressbars} for linear ODEs
+	\item Adaptivity
+\end{itemize}
+
+
+\subsubsection{Weighted residual method}
+Unlike the collocation method which forces the residual to be zero at a finite number of
+collection points, the weighted residual method minimizes the residual over the entire
+interval of integration.
+
+\subsection{Relationship with existing quadrature projects} % (fold)
+\label{sub:relation_with_existing_quadrature}
+There are some existing quadrature projects in Julia ecosystem, e.g. \textit{QuadGK.jl} and
+\textit{FastGaussQuadrature.jl}. Although they can calculate the quadrature, those packages
+are not particularly helpful for the collocation method. The key for collocation method is to
+form a discretization and apply the quadrature rules to the discretization by using a matrix
+(potentially sparse matrix) $A$, which converts a differential equation to a linear system in
+the form of $A\vec{x}=\vec{b}$.
+% subsection relation_with_existing_quadrature (end)
+
+\subsection{Testing} % (fold)
+\label{sub:testing}
+The testing problems for this project will use some ODE BVP problems with analytical solutions.
+After I implement the collocation method, I will add more sophisticated without analytical
+solutions. Although there are testing problems that do not have analytical solutions, I can
+still make sure that I get the right results by comparing my solutions with solutions from
+the current existing robust solver (e.g. \textit{bvp4c} and \textit{bvp5c}) with very low
+tolerance. Here is an testing example:
+
+\begin{lstlisting}[mathescape=true]
+using BoundaryValueDiffEq
+using Base.Test
+
+function f(t, y, du)
+  (x, v) = y
+  du[1] = v
+  du[2] = -x
+end
+
+bc = [[0., 1.], [1., 1.]]
+domin = (0.,100.)
+bvp = BVProblem(f, domin, bc)
+@test solve(bvp)[end] == bc[2]
+
+function lorenz(t,u,du)
+ du[1] = 10.0(u[2]-u[1])
+ du[2] = u[1]*(28.0-u[3]) - u[2]
+ du[3] = u[1]*u[2] - (8/3)*u[3]
+end
+
+bc_lorenz = [[1.0,0.0,0.0],[-10.,-11.,29.]]
+
+lorenzprob = BVProblem(lorenz, (0.0,1.0), bc_lorenz)
+@test norm(solve(lorenzprob)[end] - bc_lorenz[2]) < 0.5 # The tolerance here is big, because
+														# I only implemented a very simple
+														# solver that uses the shooting method,
+														# which is not robust enough.
+\end{lstlisting}
+
+% subsection testing (end)
 
 \subsection{Timeline}
+\paragraph{Pre-GSoC} % (fold)
+\label{par:pre_gsoc}
+I am currently working on function of matrix (a.k.a. matrix function) in Julia Lab. At this
+period, I can get more experience with working in a big project and sharpen my Julia/Git skills.
+% paragraph pre_gsoc (end)
+
+\paragraph{Community Bonding: May 5 (Start) - May 30} % (fold)
+\label{par:community_bonding}
+%GG be more specific concrete. What about git do you want to learn, what about the coding style etc
+\begin{itemize}
+	\item Learn more about Julia's type system and the coding style in \textit{JuliaDiffEq}.
+	\item Get more proficient in the Git version control system.
+	\item Learn more about the collocation method and optimization methods that will be
+	used in the shooting method.
+	\item Send a pull request.
+\end{itemize}
+% paragraph community_bonding (end)
+
+\paragraph{Shooting Method: May 30 - June 15} % (fold)
+\label{par:shooting_method_may_30_june_15}
+\begin{itemize}
+	\item Design a general framework for BVP problems. (e.g. \textit{BVProblem} and \textit{
+	BoundaryCondition} data structure.)
+	\item Generalize the shooting method.
+	\item Test shooting method with some simple problems with analytical solutions.
+	\item Learn more deeply about collocation methods.
+	\item Send a pull request.
+\end{itemize}
+% paragraph shooting_method_may_30_june_15 (end)
+
+\paragraph{Discretization Algorithms: June 15 - July 10} % (fold)
+\label{par:discretization_algorithms}
+\begin{itemize}
+	\item Design a basic framework for different types of discretization for solving
+	BVP problems.
+	\item Implement different kinds of discretization algorithms for collection methods.
+	\item Optimize those discretization algorithms that are implemented with \textit{SIMD}
+	and some other techniques.
+	\item Send a pull request.
+\end{itemize}
+% paragraph discretization_algorithms (end)
+
+\paragraph{Collocation Method: July 10 - July 31} % (fold)
+\label{par:least_squares_method_july_10_july_31}
+\begin{itemize}
+	\item Implement the collocation method.
+	\item Add more sophisticated testing BVP problems to test against the collocation method.
+	\item Optimize the collocation method.
+	\item Send a pull request.
+\end{itemize}
+% paragraph least_squares_method_july_10_july_31 (end)
+
+\paragraph{Documentation: July 31 - August 15} % (fold)
+\label{par:weighted_residual_method_july_31_august_15}
+\begin{itemize}
+	\item Write a documentation page for the BVP solvers that I have written.
+	\item Add more tests for BVP problem and tune the algorithm.
+	\item Send a pull request.
+\end{itemize}
+% paragraph weighted_residual_method_july_31_august_15 (end)
+
+\paragraph{Review \& Stretch Goals: August 15 - August 29 (End)} % (fold)
+\label{par:review_&_stretch_goals_august_15_august_29}
+\begin{itemize}
+	% \item Write a documentation page for the BVP solvers that I have written.
+	\item Start to work on the stretch goals.
+	\item Send a pull request.
+	\item Review and test all the code that I have written in GSoC project.
+\end{itemize}
+% paragraph review_&_stretch_goals_august_15_august_29 (end)
 
 \subsection{Potential Hurdles} % (fold)
 \label{sub:potential_hurdles}
-
+The potential hurdles I see are mostly because I have not worked in a big project like
+this before, and I may need to put in some effort to be familiar with the coding style in \textit{JuliaDiffEq}
+organization. I need to be proficient with Git. I also need to be more fluent in Julia's
+type system. I used to work in linear algebra which does not require much familiarity
+about the software engineering side. To overcome these hurdles I am going to put in effort
+and time to learn Julia's type system and Git as I planed in \ref{par:community_bonding}.
 % subsection potential_hurdles (end)
 
 \subsection{Mentor} % (fold)
 \label{sub:mentor}
-
+My mentor will be Christopher Rackauckas.
 % subsection mentor (end)
 
 % section the_project (end)
@@ -136,23 +311,86 @@ discretization this summer.
 
 \subsection{Julia Coding Demo} % (fold)
 \label{ssub:julia_coding_demo}
+Here is a selection of GitHub repositories and other Julia projects I have contributed code towards:
 
+\url{https://github.com/JuliaDiffEq/BoundaryValueDiffEq.jl}
+
+\url{https://github.com/obiajulu/ODE.jl/tree/radau} Worked with with Joseph Obiajulu.
+
+\url{https://github.com/YingboMa/BVP.jl}
+
+\url{https://github.com/YingboMa/Funm.jl}
 % subsection julia_coding_demo (end)
 
 \subsection{About me} % (fold)
 \label{ssub:about_me}
-
+My name is Yingbo Ma, and I am currently a senior at Lexington High School. I have been admitted by
+University of California, Irvine (UCI). I am interested in mathematics and physics and willing to
+learn new things about them. I worked with Joseph Obiajulu on \textit{ODE.jl} last summer in the MIT
+Julia Lab. I still go to Julia Lab regularly now, and now I am working on fixing the \textit{logm}
+function in Julia base.
 % subsection about_me (end)
 
 \subsection{Contact Information} % (fold)
 \label{ssub:contact_information}
+\paragraph{Email:} mayingbo5@gmail.com
+
+\paragraph{GitHub:} YingboMa
 
 % subsection contact_information (end)
 
 \section{Summer Logistics} % (fold)
 \label{sec:summer_logistics}
 
+%GG: What is the guidelines for how many hours you are expected from a GSoC? I would make sure that you have
+%    your timeline be very similar.
+\paragraph{Work hours:} I expect to be able to work over 35 hours per week throughout the summer.
+I do not have much other things to do besides working in this project, so I can put most of my
+attention toward it. Overall, I am able to put 400-500 hours into this project.
+
 % section summer_logistics (end)
+
+\section{Quadrature} % (fold)
+\label{sec:quadrature}
+\subsection{Simpson Quadrature}
+Simpson's rule is a three-point Newton-Cotes quadrature rule. Its formula is
+\[\int _{a}^{b}f(x)\,dx\approx {\tfrac {b-a}{6}}\left[f(a)+4f\left({\tfrac {a+b}{2}}\right)+f(b)\right].
+\cite{simpson}\]
+
+The error for the Simpson's rule is
+
+\[{\frac{1}{90}}\left({\frac{b-a}{2}}\right)^{5}\left|f^{{(4)}}(\xi )\right|,\]
+
+where the $\xi \in (a, b)$ by Lagrange error bound. \cite{simp}
+
+Simpson's 3/8 rule is
+
+\[\int _{a}^{b}f(x)\,dx\approx {\tfrac {3h}{8}}\left[f(x_{0})+3f(x_{1})+3f(x_{2})+
+2f(x_{3})+3f(x_{4})+3f(x_{5})+2f(x_{6})+...+f(x_{n})\right], \cite{simp38}\]
+
+where $h=(b-a)/h$ and $x_i = a+ih$.
+
+\subsection{Gauss–Legendre quadrature}
+The Gauss–Legendre quadrature's weight is
+
+\[w_{i}={\frac {2}{\left(1-x_{i}^{2}\right)[P'_{n}(x_{i})]^{2}}}=
+\frac{2\left(1-x_{i}^2\right)}{\left((n+1)\right)^2[P_{n+1}(x_{i})]^{2}} \cite{gauss}\]
+
+\subsection{Lobatto Quadrature}
+The Lobatto quadrature on the interval $[-1,1]$ is
+
+\[\int _{-1}^{1}{f(x)\,dx} = \frac{2}{n(n-1)}[f(1)+f(-1)] + \sum _{i=2}^{n-1}{w_{i}f(x_{i})}+R_{n},
+\cite{lobatto}\]
+
+with the weights
+
+\[w_{i}={\frac {2}{n(n-1)[P_{n-1}(x_{i})]^{2}}},\qquad x_{i}\neq \pm 1. \cite{lobatto}\]
+
+$P_n$ is the $n$th order Legendre polynomial, and it can be written as
+
+\[P_{n}(x)=2^{n} \cdot \sum _{k=0}^{n}x^{k}\binom{n}{k}\binom{{\frac {n+k-1}{2}}}{n}.\]
+
+% section quadrature (end)
 
 % Citations
 \bibliographystyle{unsrt}
