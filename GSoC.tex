@@ -23,7 +23,7 @@ An ordinary differential equation (ODE)  is an equality relationship between a f
 and its derivatives, and an $n$th order ODE can be written as
 
 \[F(x, y, y', \cdots, y^{(n)}) = 0\].
-
+%%GG also biological, economic, etc. Might be worth making this even broader. Really ODE are central to every branch of science
 Physics and engineering often present ODE problems. Many physical phenomena can be reduced into an ODE. Newton's second law of motion, namely $F=ma$ can be rewritten into an ODE as $m\frac{d^2x}{dt^2}
 =F(x)$, since $a$ can depend on time. ODEs can be very difficult to solve. There are many cases in which an ODE does not have an analytical solution. Therefore, numerical methods need to be used to solve
 ODEs by approximating the solution. There are two kinds of ODE problems. One is initial
@@ -38,6 +38,8 @@ ecosystem.
 
 \subsubsection{Introduction} % (fold)
 \label{ssub:introduction}
+%GG I would add some more information on why, this is important for a variety of reasons etc. Let someone that is not familiar with
+%   BVP solvers understand why i) this is needed for the julia ecosystem ii) why the native version is important (ie type generic etc)
 The project that I propose to work on in Google's Summer of Code project is the native Julia
 implementation of some BVP solving methods for ODE, namely, collocation method and shooting method.
 % subsubsection introduction (end)
@@ -198,12 +200,16 @@ interval of integration.
 \subsection{Timeline}
 \paragraph{Pre-GSoC} % (fold)
 \label{par:pre_gsoc}
+%%GG this is unclear. You need to build on what it means to be working at Julia Lab. Also it will be stronger
+%%   if you make this sound more positive. "I am currently working on ... this will make the transition to
+%%   the GSoC project seemless as I will be able to build on the Julia/Github skillsets ..." kind of thing
 Unfortunately, I have to work on function of matrix (a.k.a. matrix function) in Julia Lab.
 I don't have much time to work on the GSoC project until it starts.
 % paragraph pre_gsoc (end)
 
 \paragraph{Community Bonding: May 5 (Start) - May 30} % (fold)
 \label{par:community_bonding}
+%GG be more specific concrete. What about git do you want to learn, what about the coding style etc
 \begin{itemize}
 	\item Learn more about Julia's type system and the coding style in \textit{JuliaDiffEq}.
 	\item Get proficient in Git version control system.
@@ -268,6 +274,7 @@ I don't have much time to work on the GSoC project until it starts.
 
 \subsection{Potential Hurdles} % (fold)
 \label{sub:potential_hurdles}
+%%GG again build on this. Try to be more concrete in each of the hurdles and how you might be able to overcome them.
 The potential hurdles I see are mostly because I have not worked in a big project like
 this before, and I may use some effort to be familiar with the coding style in \textit{JuliaDiffEq}
 organization. I need to be proficient with Git. I also need to be more fluent in Julia's
@@ -285,6 +292,7 @@ My mentor will be Christopher Rackauckas.
 
 \subsection{Julia Coding Demo} % (fold)
 \label{ssub:julia_coding_demo}
+%GG Here is a selection of github repositories and other Julia projects I have contributed code towards:
 Here are my code that is written in Julia.
 
 \url{https://github.com/JuliaDiffEq/BoundaryValueDiffEq.jl}
@@ -316,6 +324,8 @@ function in Julia base.
 \section{Summer Logistics} % (fold)
 \label{sec:summer_logistics}
 
+%GG: What is the guidelines for how many hours you are expected from a GSoC? I would make sure that you have
+%    your timeline be very similar.
 \paragraph{Work hours:} I expect to be able to work over 35 hours per week though this summer.
 I do not have much other thing to do besides working in this project, so I can put most of my
 attention in this project. Over all I am able to put 400-500 hours into this project.
