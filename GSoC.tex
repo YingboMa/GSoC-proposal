@@ -10,10 +10,10 @@
 \maketitle
 \tableofcontents
 
-\section{Synopsis} % (fold)
-\label{sec:synopsis}
+% \section{Synopsis} % (fold)
+% \label{sec:synopsis}
 
-% section synopsis (end)
+% % section synopsis (end)
 
 \section{The Project} % (fold)
 \label{sec:the_project}
@@ -118,17 +118,95 @@ Simpson discretization, Gauss discretization, Radau discretization, and Labatto
 discretization this summer.
 
 \subsection{Stretch Goals and Future Directions}
+The stretch goals for this summer would be add tests for collection method and shooting method, to
+make general recommendation for helping users to choose solvers.
 
 \subsection{Timeline}
+\paragraph{Pre-GSoC} % (fold)
+\label{par:pre_gsoc}
+Unfortunately, I have to work on function of matrix (a.k.a. matrix function) in Julia Lab.
+I don't have much time to work on the GSoC project until it starts.
+% paragraph pre_gsoc (end)
+
+\paragraph{Community Bonding: May 5 (Start) - May 30} % (fold)
+\label{par:community_bonding}
+\begin{itemize}
+	\item Learn more about Julia's type system and the coding style in \textit{JuliaDiffEq}.
+	\item Get proficient in Git version control system.
+	\item Learn more about the collocation method and optimization methods that will be
+	used in the shooting method.
+	\item Send a PR.
+\end{itemize}
+% paragraph community_bonding (end)
+
+\paragraph{Shooting Method: May 30 - June 15} % (fold)
+\label{par:shooting_method_may_30_june_15}
+\begin{itemize}
+	\item Design a general framework for BVP problems. (e.g. \textit{BVProblem} and \textit{
+	BoundaryCondition} data structure.)
+	\item Generalize shooting method.
+	\item Test shooting method with some simple problems with analytical solutions.
+	\item Learn more deeply about collocation methods.
+	\item Send a PR.
+\end{itemize}
+% paragraph shooting_method_may_30_june_15 (end)
+
+\paragraph{Discretization Algorithms: June 15 - July 10} % (fold)
+\label{par:discretization_algorithms}
+\begin{itemize}
+	\item Design a basic framework for different types of discretization for solving
+	BVP problems.
+	\item Implement different kinds of discretization algorithms for collection methods.
+	\item Optimize those discretization algorithms that are implemented with \textit{SIMD}
+	and some other techniques.
+	\item Send a PR.
+\end{itemize}
+% paragraph discretization_algorithms (end)
+
+\paragraph{Least Squares Collocation Method: July 10 - July 31} % (fold)
+\label{par:least_squares_method_july_10_july_31}
+\begin{itemize}
+	\item Implement the least squares collocation method.
+	\item Add more sophisticated testing BVP problems to test against the least squares
+	collocation method.
+	\item Optimize the least squares collocation method.
+	\item Send a PR.
+\end{itemize}
+% paragraph least_squares_method_july_10_july_31 (end)
+
+\paragraph{Weighted Residual Method: July 31 - August 15} % (fold)
+\label{par:weighted_residual_method_july_31_august_15}
+\begin{itemize}
+	\item Implement the weighted residual method.
+	\item Test weighted residual method, and add more tests to test against the weighted
+	residual method.
+	\item Optimize the weighted residual method.
+	\item Send a PR.
+\end{itemize}
+% paragraph weighted_residual_method_july_31_august_15 (end)
+
+\paragraph{Documentation \& Review \& Stretch Goals: August 15 - August 29 (End)} % (fold)
+\label{par:review_&_stretch_goals_august_15_august_29}
+\begin{itemize}
+	\item Write a documentation page for the BVP solvers that I have written.
+	\item Start to work on the Stretch Goals.
+	\item Send a PR.
+	\item Review and test all the code that I have written in GSoC project.
+\end{itemize}
+% paragraph review_&_stretch_goals_august_15_august_29 (end)
 
 \subsection{Potential Hurdles} % (fold)
 \label{sub:potential_hurdles}
-
+The potential hurdles I see are mostly because I have not worked in a big project like
+this before, and I may use some effort to be familiar with the coding style in \textit{JuliaDiffEq}
+organization. I need to be proficient with Git. I also need to be more fluent in Julia's
+type system. I used to work in linear algebra which does not require much familiarity
+about the software engineering side.
 % subsection potential_hurdles (end)
 
 \subsection{Mentor} % (fold)
 \label{sub:mentor}
-
+My mentor will be Christopher Rackauckas.
 % subsection mentor (end)
 
 % section the_project (end)
@@ -136,21 +214,40 @@ discretization this summer.
 
 \subsection{Julia Coding Demo} % (fold)
 \label{ssub:julia_coding_demo}
+Here are my code my in Julia.
 
+\url{https://github.com/JuliaDiffEq/BoundaryValueDiffEq.jl}
+
+\url{https://github.com/obiajulu/ODE.jl/tree/radau} Worked with with Joseph Obiajulu.
+
+\url{https://github.com/YingboMa/BVP.jl}
+
+\url{https://github.com/YingboMa/Funm.jl}
 % subsection julia_coding_demo (end)
 
 \subsection{About me} % (fold)
 \label{ssub:about_me}
-
+My name is Yingbo Ma, and I am currently a senior in Lexington Public High School. I got admitted by
+University of California, Irvine (UCI). I am interested in mathematics and physics and willing to
+learn new things about them. I worked with Joseph Obiajulu on \textit{ODE.jl} last summer in MIT
+Julia Lab. I still go to Julia Lab regularly now. I am working on fixing the \textit{logm} function
+in Julia base.
 % subsection about_me (end)
 
 \subsection{Contact Information} % (fold)
 \label{ssub:contact_information}
+\paragraph{Email:} mayingbo5@gmail.com
+
+\paragraph{GitHub:} YingboMa
 
 % subsection contact_information (end)
 
 \section{Summer Logistics} % (fold)
 \label{sec:summer_logistics}
+
+\paragraph{Work hours:} I expect to be able to work over 35 hours per week though this summer.
+I do not have much other thing to do besides working in this project, so I can put most of my
+attention in this project. Over all I am able to put 400-500 hours into this project.
 
 % section summer_logistics (end)
 
