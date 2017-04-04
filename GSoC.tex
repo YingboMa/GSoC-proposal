@@ -181,11 +181,11 @@ the form of $A\vec{x}=\vec{b}$.
 \subsection{Testing} % (fold)
 \label{sub:testing}
 The testing problems for this project will use some ODE BVP problems with analytical solutions.
-After I implement the collocation method, I will add more sophisticated without analytical
+After I implement the collocation method, I will add more sophisticated tests that do not have analytical
 solutions. Although there are testing problems that do not have analytical solutions, I can
 still make sure that I get the right results by comparing my solutions with solutions from
-the current existing robust solver (e.g. \textit{bvp4c} and \textit{bvp5c}) with very low
-tolerance. Here is an testing example:
+the current existing robust solvers (e.g. \textit{bvp4c} and \textit{bvp5c}) with very low
+tolerance. Here is a testing example:
 
 \begin{lstlisting}[mathescape=true]
 using BoundaryValueDiffEq
