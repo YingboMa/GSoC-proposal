@@ -1,0 +1,23 @@
+\usepackage{microtype}
+
+\usepackage{newunicodechar}
+\newunicodechar{α}{\ensuremath \alpha}
+\newunicodechar{β}{\ensuremath \beta}
+
+\usepackage{listings}
+\lstdefinelanguage{julia}{
+  basicstyle=\small\ttfamily,
+  showspaces=false,
+  showstringspaces=false,
+  keywordstyle={\textbf},
+  morekeywords={if,else,elseif,while,for,begin,end,quote,try,catch,return,local,abstract,function,generated,macro,ccall,finally,typealias,break,continue,type,global,module,using,import,export,const,let,bitstype,do,in,baremodule,importall,immutable},
+  escapeinside={~}{~},
+  morecomment=[l]{\#},
+  commentstyle={},
+  morestring=[b]",
+}
+\lstset{language=julia, numbers=left, numberstyle=\tiny, mathescape=true}
+
+\bibliographystyle{siam}
+
+\usepackage{todonotes}
