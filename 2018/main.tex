@@ -1,32 +1,105 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 \input{typesetting.tex}
-\author{Yingbo Ma}
-\date{\today}
-\title{GSoC proposal}
+\author{Yingbo Ma\\ \tt{yingbom@uci.edu}}
+\date{March 2018}
+\title{Stiffness Detection and Automatic Switching Algorithms for
+OrindaryDiffEq.jl and DAE Support for SciCompDSL.jl \\
+\large{Proposal for the GSoC 2018 Project}}
 
 \begin{document}
 \maketitle
 \tableofcontents
 
-\begin{abstract}
-My abstract.
-\end{abstract}
+\section{Motivation \& The Project}
+There are two projects that I propose for the Google Summer of Code (GSoC)
+Program, one is \textit{stiffness detection and automatic switching
+algorithms}, and the other is \textit{tooling of} \texttt{SciCompDSL.jl}. By
+the end of the program, I hope to have implemented a production ready automatic
+stiffness detection algorithms and index reduction algorithm for differential
+algebraic equation (DAE).
 
-\section{The Project}
-% TODO: What do you want to have completed by the end of the program?
+Stiff ordinary differential equations (ODEs) are a kind of problem which is
+very hard to solve by most explicit numerical methods, however, they can be
+solved by implicit methods like the family of Rosenbrock methods or backward
+differentiation formulae (BDF) without struggle. The problem is that the
+methods which are good for stiff ODEs are not fast, as they have to solve for
+non-linear or linear systems in each time step. Yet, most stiff problems are
+not stiff throughout the whole domain of interest. This leads to the motivation
+of my first project, \textit{stiffness detection and automatic switching
+algorithms}. Conventionally, one uses only a single algorithm to solve for the
+entire domain of interest. Thus, one is forced to use a stiff algorithm, although
+there is only a very small interval in the domain that is stiff. The
+auto-switching algorithm can solve this dilemma and raise the efficiency of
+solving ODEs, because stiff algorithms will only be applied to the stiff part
+of the domain, and non-stiff algorithms will solve the rest of the problem
+quickly. This project is beneficial for most people who use the
+\textit{JuliaDiffEq} ecosystem, because it removes the burden of having to test
+multiple algorithms for one problem and chose the more efficient one. It can
+also help to save much computation time for huge ODE systems, e.g. time
+stepping of a PDE discretization.
 
-% TODO: Who’s interested in the work, and how will it benefit them?
+My second project is to implement index reduction algorithms for differential
+algebraic equations (DAEs). DAEs are raised naturally from Euler-Lagrange
+equations with constraints and many modeling problems. However, numerical DAE
+solvers can only handle Hessenberg index-1 and Hessenberg index-2 forms,
+\begin{align}
+  &\textbf{Hessenberg index-1}
+  \begin{dcases}
+    y' &= f(t,y,z)\\
+    0 &= g(t,y,z)
+  \end{dcases}\\
+  &\textbf{Hessenberg index-2}
+  \begin{dcases}
+    y' &= f(t,y,z)\\
+    0 &= g(t,y)
+  \end{dcases}
+\end{align}
+so one has to reduce the index of the DAE to index-1 or index-2 form. However,
+it is difficult and cumbersome to reduce the indices of a DAE system by hand.
+The \texttt{SciCompDSL.jl} package has enough information about a DAE system,
+because it has its own computational graph of the system. This project benefits
+people who work on modelings and dynamical systems when the solutions' local
+coordinates are complicated and not trivial to convert to.
 
 % TODO: What are the potential hurdles you might encounter, and how can you
 % resolve them?
+\subsection{Potential Hurdles}
+The potential hurdles that I expect are mostly about design decisions. I
+believe that I can overcome this hurdle by learning from my potential
+mentors'--- Jiahao and Chris'---suggestions. For instance, when I was
+implementing the order reduction algorithm for systems of ODEs, Chris taught me
+that this kind of algorithms should be implemented as a transformation that is
+\[
+  f: \texttt{DiffEqSystem}\mapsto \texttt{DiffEqSystem},
+\]
+so that it fits into the design of the \texttt{SciCompDSL.jl} package, and
+makes it more flexible and extendible~\cite{i49}.
 
+Another hurdle that I expect to face during the GSoC project is that I am not
+good at using \texttt{Git}. I might mess up a pull request by a bad \texttt{git
+rebase}. I am confident that I can subdue this problem by being extra careful
+when I merge or rebase in a \texttt{Git} repository.
+
+\section{Milestones}
 % TODO: How will you prioritize different aspects of the project like features,
 % API usability, documentation, and robustness?
+There are many different aspects of a coding project like features, API
+usability and documentations. I will prioritize the robustness aspect over
+everything else in the beginning of the GSoC project, since the correctness is
+very critical for numerical analysis softwares. I will achieve robustness by
+adding extensive tests and benchmarks for all of my pull requests. I will shift
+my attention to API usability after I finish all the features, as a software
+must be friendly to the users to gain popularity. After I stabilize the API, I
+will move my focus to documentations. I will not only write the standard
+documentations in \url{http://docs.juliadiffeq.org/latest/}, but also more
+tutorials in the \texttt{DiffEqTutorials.jl} repository. Here is my tentative
+plan for the GSoC project.
 
 % TODO: What milestones can you target throughout the period?
 
 % TODO: Are there any stretch goals you can make if the main project goes
 % smoothly? Tell us how you’re going to wow us with the final result!
+
 
 \section{Code Portfolio}
 
@@ -36,28 +109,20 @@ My abstract.
 % TODO: SciCompDSL.jl
 
 \section{About Me}
-% TODO: What academic, professional or hobby programming experience do you
-%have, and how will it help you with your project?
+I am a physics major freshman in the University of California, Irvine. I am a
+former GSoC student who worked on boundary value problem solvers,
+Runge-Kutta-Nystr{\"o}m methods and symplectic integrators.
 
-% TODO: Have you contributed to open source projects before? (Link us to some
-% issues and patches, if any)
+\subsection{Contact Information}
+\paragraph{Email:} mayingbo5@gmail.com
+\paragraph{GitHub:} YingboMa
 
-% TODO: Why are you interested in Julia? Have you used it much before? You need
-% to demonstrate your ability to use Julia by the beginning of the GSoC. GSoC
-% is not for learning the Julia language, though extensive prior experience is
-% not required.
-
-% TODO: Do you have the mathematical/scientific background for your project?
-% Many of the Julialang projects have a significant portion that require
-% technical expertise and applicants need to demonstrate their ability to
-% handle the chosen project.
-
-% TODO: How should we contact you? Let us know your email address and GitHub
-% username.
-
-\section{Logistics}
-% TODO: What other time commitments, such as summer courses, other jobs, planned
-%vacations, etc., will you have over the summer?
+\section{Summer Logistics}
+I expect to be able to work over 30 hours per week throughout the summer. I do
+not have any summer courses nor other jobs, so I can put most of my attention
+toward this GSoC project. Overall, I will be able to put 350-400 hours into
+this project. If possible I plan to visit MIT Julia Lab during this GSoC
+project.
 
 \bibliography{cite}
 \end{document}
