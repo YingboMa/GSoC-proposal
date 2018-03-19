@@ -3,7 +3,7 @@
 \author{Yingbo Ma\\ \tt{yingbom@uci.edu}}
 \date{March 2018}
 \title{Stiffness Detection and Automatic Switching Algorithms for
-OrindaryDiffEq.jl and DAE Support for SciCompDSL.jl \\
+OrdinaryDiffEq.jl and DAE Support for SciCompDSL.jl \\
 \large{Proposal for the GSoC 2018 Project}}
 
 \begin{document}
@@ -18,7 +18,17 @@ the end of the program, I hope to have implemented a production ready automatic
 stiffness detection algorithms and index reduction algorithm for differential
 algebraic equation (DAE).
 
-Stiff ordinary differential equations (ODEs) are a kind of problem which is
+\subsection{Goal 1: Implement stiffness detection and automatic switching
+algorithms}
+An ordinary differential equation (ODE) is an equality relationship among a
+function $y(t)$, its independent variable $t$ and its derivatives. An $n$th
+order ODE can be written as
+\begin{equation}
+  F(t, y(t), y'(t), \cdots, y^{(n-1)}(t)) = 0.
+\end{equation}
+ODEs are very important, because they are raised from every branch of science.
+Most of the ODEs which people encounter have no analytical solution. Hence,
+people must solve them numerically. Stiff ODEs are a kind of problem which is
 very hard to solve by most explicit numerical methods, however, they can be
 solved by implicit methods like the family of Rosenbrock methods or backward
 differentiation formulae (BDF) without struggle. The problem is that the
@@ -27,8 +37,8 @@ non-linear or linear systems in each time step. Yet, most stiff problems are
 not stiff throughout the whole domain of interest. This leads to the motivation
 of my first project, \textit{stiffness detection and automatic switching
 algorithms}. Conventionally, one uses only a single algorithm to solve for the
-entire domain of interest. Thus, one is forced to use a stiff algorithm, although
-there is only a very small interval in the domain that is stiff. The
+entire domain of interest. Thus, one is forced to use a stiff algorithm,
+although there is only a very small interval in the domain that is stiff. The
 auto-switching algorithm can solve this dilemma and raise the efficiency of
 solving ODEs, because stiff algorithms will only be applied to the stiff part
 of the domain, and non-stiff algorithms will solve the rest of the problem
@@ -38,20 +48,29 @@ multiple algorithms for one problem and chose the more efficient one. It can
 also help to save much computation time for huge ODE systems, e.g. time
 stepping of a PDE discretization.
 
+\subsubsection{Implementation Details}
+
+\subsection{Goal 2: Tooling for \texttt{SciCompDSL.jl}}
+
+\subsection{Goal 3: Implement DAE index reduction algorithms}
 My second project is to implement index reduction algorithms for differential
 algebraic equations (DAEs). DAEs are raised naturally from Euler-Lagrange
-equations with constraints and many modeling problems. However, numerical DAE
-solvers can only handle Hessenberg index-1 and Hessenberg index-2 forms,
+equations with constraints and many modeling problems, and its general form is
+\begin{equation}
+  F(t, \vec{x}, \frac{d\vec{x}}{dt}) = \vec{0}.
+\end{equation}
+However, numerical DAE solvers can only handle Hessenberg index-1 and
+Hessenberg index-2 forms,
 \begin{align}
   &\textbf{Hessenberg index-1}
   \begin{dcases}
-    y' &= f(t,y,z)\\
-    0 &= g(t,y,z)
+    y_i' &= f_i(t,y_i,z_i)\\
+    0 &= g_i(t,y,z)
   \end{dcases}\\
   &\textbf{Hessenberg index-2}
   \begin{dcases}
-    y' &= f(t,y,z)\\
-    0 &= g(t,y)
+    y'_i &= f_i(t,y_i,z_i)\\
+    0 &= g_i(t,y)
   \end{dcases}
 \end{align}
 so one has to reduce the index of the DAE to index-1 or index-2 form. However,
@@ -61,8 +80,6 @@ because it has its own computational graph of the system. This project benefits
 people who work on modelings and dynamical systems when the solutions' local
 coordinates are complicated and not trivial to convert to.
 
-% TODO: What are the potential hurdles you might encounter, and how can you
-% resolve them?
 \subsection{Potential Hurdles}
 The potential hurdles that I expect are mostly about design decisions. I
 believe that I can overcome this hurdle by learning from my potential
@@ -79,6 +96,11 @@ Another hurdle that I expect to face during the GSoC project is that I am not
 good at using \texttt{Git}. I might mess up a pull request by a bad \texttt{git
 rebase}. I am confident that I can subdue this problem by being extra careful
 when I merge or rebase in a \texttt{Git} repository.
+
+\subsection{Potential Mentors}
+Jiahao Chen (\texttt{@jiahao}) is going to be my primary mentor, and
+Christopher Rackauckas (\texttt{@ChrisRackauckas}) is going to my secondary
+mentor.
 
 \section{Milestones}
 % TODO: How will you prioritize different aspects of the project like features,
@@ -100,18 +122,29 @@ plan for the GSoC project.
 % TODO: Are there any stretch goals you can make if the main project goes
 % smoothly? Tell us how you’re going to wow us with the final result!
 
+\paragraph{Community Bonding: April 5 --- May 14}
+I am going to read more literature about the stiffness of ODEs.
 
 \section{Code Portfolio}
+Here is this a list of contributions that I did during the previous GSoC
+project.
+\url{https://gist.github.com/YingboMa/65dbe1a43564ab367408588467ccb671}
 
 \section{Deliverables}
 % TODO: Stiffness Detection and Automatic Switching Algorithms
-
 % TODO: SciCompDSL.jl
 
 \section{About Me}
 I am a physics major freshman in the University of California, Irvine. I am a
 former GSoC student who worked on boundary value problem solvers,
 Runge-Kutta-Nystr{\"o}m methods and symplectic integrators.
+
+\subsection{Academic Details}
+\begin{itemize}
+  \item University: University of California, Irvine
+  \item Major: Physics (Freshman)
+  \item GPA: 4.0
+\end{itemize}
 
 \subsection{Contact Information}
 \paragraph{Email:} mayingbo5@gmail.com
