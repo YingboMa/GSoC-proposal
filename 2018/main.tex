@@ -3,7 +3,7 @@
 \author{Yingbo Ma\\ \tt{yingbom@uci.edu}}
 \date{March 2018}
 \title{Stiffness Detection and Automatic Switching Algorithms for
-OrdinaryDiffEq.jl and DAE Support for SciCompDSL.jl \\
+OrdinaryDiffEq.jl and Tooling for ModelingToolkit.jl \\
 \large{Proposal for the GSoC 2018 Project}}
 
 \begin{document}
@@ -13,13 +13,13 @@ OrdinaryDiffEq.jl and DAE Support for SciCompDSL.jl \\
 \section{Motivation \& The Project}
 There are two projects that I propose for the Google Summer of Code (GSoC)
 Program, one is \textit{stiffness detection and automatic switching
-algorithms}, and the other is \textit{tooling of} \texttt{SciCompDSL.jl}. By
+algorithms}, and the other is \textit{tooling of} \texttt{ModelingToolkit.jl}. By
 the end of the program, I hope to have implemented a production ready automatic
-stiffness detection algorithms and index reduction algorithm for differential
-algebraic equation (DAE).
+stiffness detection algorithms, intermediate representation (IR) manipulating
+tools, and index reduction algorithm for differential algebraic equation (DAE).
 
 \subsection{Goal 1: Implement stiffness detection and automatic switching
-algorithms}
+algorithms} \label{goal1}
 An ordinary differential equation (ODE) is an equality relationship among a
 function $y(t)$, its independent variable $t$ and its derivatives. An $n$th
 order ODE can be written as
@@ -49,11 +49,69 @@ also help to save much computation time for huge ODE systems, e.g. time
 stepping of a PDE discretization.
 
 \subsubsection{Implementation Details}
+Higham and Trefethen~\cite{stiffode} pointed out that an ODE system is stiff
+when the pseudospectrum of its $J$ has big radii while it has a small abscissa,
+where $J$ denotes a Jacobian matrix. Computing the pseudospectra of a linear
+operator is very costly, so in practice, it makes sense to only calculate the norm
+or the approximated largest eigenvalue of $J$.
 
-\subsection{Goal 2: Tooling for \texttt{SciCompDSL.jl}}
+The simplest automatic stiffness detection on explicit Runge-Kutta algorithms
+is proposed by Ernst Hairer~\cite{hairer2}. One can use
+\begin{equation}
+  \abs{\lambda} = \frac{\norm{f(y+v, t)-f(y, t)}}{\norm{v}}
+\end{equation}
+to approximate the dominant eigenvalue of the Jacobian matrix of the function
+$f(y, t)$ when $\norm{v}$ is small. For explicit Runge-Kutta methods like
+Dormand-Prince and Tsitouras $5/4$ pairs, there is the relation $c_6 = c_7 =
+1$. Hence, one can use
+\begin{equation}
+  \varrho = \frac{\norm{k_7-k_6}}{\norm{g_7-k_6}}\qqtext{where } k_i = f(g_i,
+  t_0 + c_i\cdot \Delta t)
+\end{equation}
+to produce a decent approximation of the most significant eigenvalue.
+Naturally, one can classify a problem to be stiff when $\Delta
+t\cdot\varrho/S \ll 1$. Where $S$ is the width of the stability domain of the
+Runge-Kutta algorithm. Currently, the implementation reads
+
+\begin{lstlisting}
+g6 = uprev+dt*(a61*k1+a62*k2+a63*k3+a64*k4+a65*k5)
+k6 = f(g6, p, t+dt)
+g7 = u
+rho = integrator.opts.internalnorm(k7 - k6)/
+      integrator.opts.internalnorm(g7 - g6)
+stiffness = rho*dt/3.3
+\end{lstlisting}
+
+and here is a demonstration of this automatic stiffness detection method with
+the infamous Dormand-Prince $5/4$ integrator. The ODEs that the integrator
+solves are
+\begin{align}
+  y'_1 &= y_2\\
+  y'_2 &= ((1-y_1^2)y_2-y_1) / \varepsilon
+\end{align}
+where $\varepsilon$ is $0.003$.
+
+\input{img/vdp.tex}
+
+\subsection{Goal 2: Tooling for \texttt{ModelingToolkit.jl}}
+ModelingToolkit.jl~\cite{modelingtoolkit} is an intermediate representation
+(IR) of computational graphs for scientific computing problems. My second goal
+during this GSoC project is to implement expression parsing tools and utilities
+for IR manipulation in the repository. For instance, user
+Borisov~\cite{parsing} expression parsing of the form
+\begin{lstlisting}
+ex = quote
+    v1 = k1*A*comp1
+    dA = -v1/comp1
+    dB = v1/comp1
+end
+params = (:k1, :comp1)
+depend_vars = (:A, :B)
+\end{lstlisting}
+which requires tools for expression parsing.
 
 \subsection{Goal 3: Implement DAE index reduction algorithms}
-My second project is to implement index reduction algorithms for differential
+My third goal is to implement index reduction algorithms for differential
 algebraic equations (DAEs). DAEs are raised naturally from Euler-Lagrange
 equations with constraints and many modeling problems, and its general form is
 \begin{equation}
@@ -75,10 +133,17 @@ Hessenberg index-2 forms,
 \end{align}
 so one has to reduce the index of the DAE to index-1 or index-2 form. However,
 it is difficult and cumbersome to reduce the indices of a DAE system by hand.
-The \texttt{SciCompDSL.jl} package has enough information about a DAE system,
+The \texttt{ModelingToolkit.jl} package has enough information about a DAE system,
 because it has its own computational graph of the system. This project benefits
 people who work on modelings and dynamical systems when the solutions' local
 coordinates are complicated and not trivial to convert to.
+
+\subsection{Stretch Goals}
+\begin{itemize}
+  \item Implement utilities for plotting Poincar\'e sections.
+  \item Implement \texttt{IIF1} and \texttt{IIF2} methods for solving
+    semi-linear partial differential equations (PDEs)
+\end{itemize}
 
 \subsection{Potential Hurdles}
 The potential hurdles that I expect are mostly about design decisions. I
@@ -89,13 +154,13 @@ that this kind of algorithms should be implemented as a transformation that is
 \[
   f: \texttt{DiffEqSystem}\mapsto \texttt{DiffEqSystem},
 \]
-so that it fits into the design of the \texttt{SciCompDSL.jl} package, and
+so that it fits into the design of the \texttt{ModelingToolkit.jl} package, and
 makes it more flexible and extendible~\cite{i49}.
 
-Another hurdle that I expect to face during the GSoC project is that I am not
-good at using \texttt{Git}. I might mess up a pull request by a bad \texttt{git
-rebase}. I am confident that I can subdue this problem by being extra careful
-when I merge or rebase in a \texttt{Git} repository.
+I also might will have struggle to use \texttt{Git}. I have messed up a pull
+request by a bad \texttt{git rebase}. However, I am confident that I can subdue
+this problem by being extra careful when I merge or rebase in a \texttt{Git}
+repository.
 
 \subsection{Potential Mentors}
 Jiahao Chen (\texttt{@jiahao}) is going to be my primary mentor, and
@@ -103,8 +168,6 @@ Christopher Rackauckas (\texttt{@ChrisRackauckas}) is going to my secondary
 mentor.
 
 \section{Milestones}
-% TODO: How will you prioritize different aspects of the project like features,
-% API usability, documentation, and robustness?
 There are many different aspects of a coding project like features, API
 usability and documentations. I will prioritize the robustness aspect over
 everything else in the beginning of the GSoC project, since the correctness is
@@ -117,22 +180,61 @@ documentations in \url{http://docs.juliadiffeq.org/latest/}, but also more
 tutorials in the \texttt{DiffEqTutorials.jl} repository. Here is my tentative
 plan for the GSoC project.
 
-% TODO: What milestones can you target throughout the period?
-
-% TODO: Are there any stretch goals you can make if the main project goes
-% smoothly? Tell us how you’re going to wow us with the final result!
-
 \paragraph{Community Bonding: April 5 --- May 14}
-I am going to read more literature about the stiffness of ODEs.
+I am going to read more literature about the stiffness of ODEs, and discuss
+many possible implementations for my mentors.
+
+\paragraph{First Milestone --- Stiffness Detection Algorithms: May 14 --- June
+11}
+I should have implemented most of the stiffness detection algorithms by June
+11, and most of the methods switching firework should also be finished as well.
+At this stage, I will be ready for dive into benchmarks, and try to find the
+best methods switching strategy, e.g. switch to one of the Rosenbrock methods
+after hitting 15 successive stiff test positives.
+
+\paragraph{First Evaluation: June 11 --- June 15}
+At this point, I should have completed my first goal~\ref{goal1}, and I should
+clean up the code that I have produced during the last period.
+
+\paragraph{Second Milestone --- \texttt{ModelingToolkit.jl} IR Tooling: June 15
+--- July 9}
+I will turn my focus to the \texttt{ModelingToolkit.jl} repository at this
+stage, but I will still try to optimize the methods switching strategy that is
+completed in the previous milestone. I will also fix some bugs in the strategy
+and the algorithms, since after stiffness detection and automatic switching
+algorithms are tagged in the \texttt{OrdinaryDiffEq.jl} repository, users will
+perhaps file bug reports about those algorithms. I should have finished
+expression parsing by July 9.
+
+\paragraph{Second Evaluation: July 9 --- July 13}
+I am going to clean up my code in the \texttt{ModelingToolkit.jl} repository.
+After filling the second evaluation form, I should have finished all my GSoC
+goals at this step.
+
+\paragraph{Third Milestone --- DAE index reduction algorithms \& Stretch Goals:
+July 13 -- August 6}
+I am going to work on DAE index reduction algorithms and stretch goals at this
+stage. DAE index reduction algorithms are not very complicated and I think I
+should have time to work on my stretch goals if everything goes well.
+
+\paragraph{Finial Evaluation: August 6 --- August 14}
+I will complete my finial evaluation report and clean up my code in this final
+stage of the GSoC project.
 
 \section{Code Portfolio}
 Here is this a list of contributions that I did during the previous GSoC
-project.
-\url{https://gist.github.com/YingboMa/65dbe1a43564ab367408588467ccb671}
+project. \url{https://gist.github.com/YingboMa/65dbe1a43564ab36740858846
+7ccb671}
 
 \section{Deliverables}
-% TODO: Stiffness Detection and Automatic Switching Algorithms
-% TODO: SciCompDSL.jl
+\begin{itemize}
+  \item Stiffness Detection and Automatic Switching Algorithms in
+    the \texttt{OrdinaryDiffEq.jl} repository.
+  \item Tools for manipulating IR in the \texttt{ModelingToolkit.jl}
+    repository.
+  \item DAE index reduction algorithms in the \texttt{ModelingToolkit.jl}
+    repository.
+\end{itemize}
 
 \section{About Me}
 I am a physics major freshman in the University of California, Irvine. I am a
