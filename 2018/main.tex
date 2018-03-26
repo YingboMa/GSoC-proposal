@@ -1,6 +1,6 @@
 \documentclass[12pt,a4paper]{article}
 \input{typesetting.tex}
-\author{Yingbo Ma}
+\author{Yingbo Ma \\ \tt{yingbom@uci.edu}}
 \date{March 2018}
 \title{Stiffness Detection and Automatic Switching Algorithms for
 OrdinaryDiffEq.jl and Tooling for ModelingToolkit.jl \\
@@ -13,7 +13,7 @@ OrdinaryDiffEq.jl and Tooling for ModelingToolkit.jl \\
 \begin{abstract}
   Stiff ordinary differential equations (ODEs) and differential algebraic
   equations (DAEs) with high index number are problems present in physical
-  problems like Brusselator and Euler-Lagrange equations with constraints.
+  models like Brusselator and Euler-Lagrange equations with constraints.
   Stiffness detection and automatic switching algorithms will not only help
   users to choose a near optimal solver for the problem, but also able to
   improve the efficiency of solving ODEs a lot by switching algorithms within
@@ -49,9 +49,9 @@ like multi-body and rigid body mechanics, electrical circuit design and optimal
 control from science and engineering. Many of those problems come from
 Euler-Lagrange equations with constraints. DAEs are not easy to solve because
 numerical methods are only specialized for solving their low-index form,
-however, most of piratical problems are not in the desired form. Hence, index
-reduction algorithms can give a huge productivity boost for people who work on
-solving DAEs, as index lowering procedures are not trivial.
+however, most of the practical problems are not in the desired form. Hence,
+index reduction algorithms can give a huge productivity boost for people who
+work on solving DAEs, as index lowering procedures are not trivial.
 
 I am interested in solving Brusselator. It is a model for a kind of
 autocatalysis, and it is specified by the reactions
@@ -171,7 +171,6 @@ solves are
 \end{align}
 where $\varepsilon$ is $0.003$.
 
-% TODO
 \input{img/vdp.tex}
 
 % In the stiffness detection and switching details, you laid out how we can do
@@ -182,6 +181,12 @@ where $\varepsilon$ is $0.003$.
 % Now is a good time to sit down and think about (read about) a few different
 % switching algorithms (given the stiffness results, how do we know when to
 % switch?), and propose a few.
+
+It is trivial to check the stiffness of an ODE system in an implicit method,
+because it already calculates the Jacobian matrix. One can bound the most
+significant eigenvalue by the infinity norm $\norm{J}_{\infty}$, and it is
+cheap to calculate an infinity norm.
+
 Switching algorithm can be done by the \texttt{CompositeAlgorithm} type. It has
 an API of \texttt{CompositeAlgorithm(algtup,choice\_function)}, where
 \texttt{algtup} is a tuple of algorithms, and \texttt{choice\_function} is the
@@ -345,8 +350,30 @@ stage of the GSoC project.
 
 \section{Code Portfolio}
 Here is this a list of contributions that I did during the previous GSoC
-project. \url{https://gist.github.com/YingboMa/65dbe1a43564ab36740858846
-7ccb671}
+project. \url{https://gist.github.com/YingboMa/65dbe1a43564ab367408588467ccb671}
+Here are some PRs that are related to this coming GSoC project.
+\begin{itemize}
+  \item WIP: Stiffness detection for \texttt{`Tsit5' \& `DP5'}: \\
+    \url{https://github.com/JuliaDiffEq/OrdinaryDiffEq.jl/pull/275}
+
+  \item Add some macros to make defining variables easier: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/30}
+
+  \item Use \texttt{`DiffRules.jl'} to build pre-defined derivatives: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/32}
+
+  \item Fix Internal Test: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/35}
+
+  \item Doing function registration through \texttt{`DiffRules.jl'}: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/37}
+
+  \item Implement conversion to first-order ODEs: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/40}
+
+  \item Add a transformation for ODE order lowering: \\
+    \url{https://github.com/JuliaDiffEq/ModelingToolkit.jl/pull/51}
+\end{itemize}
 
 \section{Deliverables}
 \begin{itemize}
@@ -371,7 +398,7 @@ Runge-Kutta-Nystr{\"o}m methods and symplectic integrators.
 \end{itemize}
 
 \subsection{Contact Information}
-\paragraph{Email:} mayingbo5@gmail.com
+\paragraph{Email:} yingbom@uci.com
 \paragraph{GitHub:} YingboMa
 
 \section{Summer Logistics}
