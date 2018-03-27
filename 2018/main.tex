@@ -15,46 +15,45 @@ OrdinaryDiffEq.jl and Tooling for ModelingToolkit.jl \\
   equations (DAEs) with high index number are problems present in physical
   models like Brusselator and Euler-Lagrange equations with constraints.
   Stiffness detection and automatic switching algorithms will not only help
-  users to choose a near optimal solver for the problem, but also able to
-  improve the efficiency of solving ODEs a lot by switching algorithms within
-  the time domain of interest. However, stiffness detection and automatic
-  switching algorithms are not implemented for most ODE solvers expect
+  users choose a near optimal solver for the problem, but it will also greatly
+  improve the efficiency of solving ODEs by switching algorithms within the
+  time domain of interest. Stiffness detection and automatic switching
+  algorithms are not presently implemented for most ODE solvers except
   \texttt{LSODA}. Also, there is no open source index reduction algorithm for
-  DAEs. My project aims to implement production ready stiffness detection and
-  automatic switching algorithms, and index reduction algorithms for DAEs by
-  the end of this summer.
+  DAEs. Thus, my project aims to implement production ready stiffness detection
+  and automatic switching algorithms, and index reduction algorithms for DAEs
+  by the end of this summer.
 \end{abstract}
 
 \section{Motivation and The Project}
 % 1) Very high level overview: why should people who don't know the subject care?
 % 2) Dive in, what are the concrete problems you want to solve? Why are they interesting?
 % 3) How are you going to solve them? Basically lay out what you're going to write about.
-Ordinary differential equations (ODEs) are very important because they are
-raised from every branch of science. Most of the ODEs which people encounter
-have no analytical solution. Hence, people must solve them numerically. Stiff
-ODEs are often produced from chemical reaction systems, electrical circuits and
-discretization of diffusion partial differential equations (PDEs). Stiffness
-is a phenomenon which the explicit numerical methods fail because the ODE
-system forces them to have very small time steps. Stiff ODE solvers can avoid
-this problem by taking a peek at the next time step. However, this technique
-comes with a high cost, which is to solve a linear or non-linear system at each
-step. People usually do not know whether their ODE systems are stiff before
-actually solving them. Automatic stiffness detection and switching algorithms
-will enable us to avoid the hassle of choosing a correction solver for each
-problem by classifying the problem type and select an appropriate solver
-automatically.
+Ordinary differential equations (ODEs) are very important because they arise
+from many branches of science. Most of the ODEs which people encounter have no
+analytical solution. Hence, people must solve them numerically. Stiff ODEs are
+often produced from chemical reaction systems, electrical circuits and
+discretization of diffusion partial differential equations (PDEs). Stiff ODEs
+cause explicit numerical methods to fail because the ODE system forces them to
+have very small time steps. Stiff ODE solvers can avoid this problem by taking
+a peek at the next time step. However, this technique comes with a high cost,
+which is to solve a linear or non-linear system at each step. People usually do
+not know whether their ODE systems are stiff before actually solving them.
+Automatic stiffness detection and switching algorithms will enable us to avoid
+the hassle of choosing a correction solver for each problem by classifying the
+problem type and selecting an appropriate solver automatically.
 
 Differential algebraic equations (DAEs) arise from a wide range of problems
 like multi-body and rigid body mechanics, electrical circuit design and optimal
-control from science and engineering. Many of those problems come from
-Euler-Lagrange equations with constraints. DAEs are not easy to solve because
-numerical methods are only specialized for solving their low-index form,
-however, most of the practical problems are not in the desired form. Hence,
-index reduction algorithms can give a huge productivity boost for people who
-work on solving DAEs, as index lowering procedures are not trivial.
+control. Many of those problems come from Euler-Lagrange equations with
+constraints. DAEs are not easy to solve because numerical methods are only
+specialized for solving their low-index form, however, most of the practical
+problems are not in the desired form. Hence, index reduction algorithms can
+give a huge productivity boost for people who work on solving DAEs, as index
+lowering procedures are not trivial.
 
-I am interested in solving Brusselator. It is a model for a kind of
-autocatalysis, and it is specified by the reactions
+For example, I am interested in the Brusselator --- a model that describes a
+kind of autocatalysis. It is specified by the reactions
 \begin{align*}
   A&\longrightarrow B\\
   2X +  Y&\longrightarrow 3X\\
@@ -73,17 +72,17 @@ Thus, we have a PDE system which has the form of
 \end{align}
 This problem is interesting, because it can be used to study pattern formation
 and chemical clock reactions, e.g. Belousov--Zhabotinsky reaction (BZ
-reaction), which is a nonlinear chemical oscillator. Method of lines is a
-common method for Brusselator, and it leads to a large system of stiff ODEs.
-Its stiffness comes from the translation of the diffusion terms $\laplacian u$
-and $\laplacian v$.
+reaction), which is a nonlinear chemical oscillator. \textit{Method of lines}
+is a common method for Brusselator, and it leads to a large system of stiff
+ODEs. Its stiffness comes from the translation of the diffusion terms
+$\laplacian u$ and $\laplacian v$.
 
 Another mathematical model that I am interested in is rigid body dynamics.
 Formulating problems in terms of manifold and local coordinates is usually very
 cumbersome. One can use Lagrange multipliers to solve those kind of problems
-easily, since one only needs to write the problem as normal but adds holonomic
-constraints and language multipliers. For instance, the motion of a simple
-pendulum in Cartesian coordinates $(x, y)$ can be described by
+easily, since one can write the problem as normal and only needs to add
+holonomic constraints and Lagrange multipliers. For instance, the motion of a
+simple pendulum in Cartesian coordinates $(x, y)$ can be described by
 \begin{align}
   x'' &= -\lambda x \\
   y'' &= -\lambda y - g \\
@@ -93,12 +92,13 @@ However, this system has a differentiation index of 3. Numerical methods are
 not able to solve such a system. Thus, one must use indexing reaction
 algorithms to transform the above into a index-1 form.
 
-There are two projects that I propose for the Google Summer of Code (GSoC)
-Program, one is \textit{stiffness detection and automatic switching
-algorithms}, and the other is \textit{tooling of} \texttt{ModelingToolkit.jl}. By
-the end of the program, I hope to have implemented a production ready automatic
-stiffness detection algorithms, intermediate representation (IR) manipulating
-tools, and index reduction algorithm for differential algebraic equation.
+Hence, there are two projects that I propose for the Google Summer of Code
+(GSoC) Program, one is \textit{stiffness detection and automatic switching
+algorithms}, and the other is \textit{tooling of} \texttt{ModelingToolkit.jl}.
+By the end of the program, I hope to have implemented production ready
+automatic stiffness detection algorithms, intermediate representation (IR)
+manipulating tools, and index reduction algorithm for differential algebraic
+equations.
 
 \subsection{Goal 1: Implement stiffness detection and automatic switching
 algorithms} \label{goal1}
@@ -108,29 +108,29 @@ order ODE can be written as
 \begin{equation}
   F(t, y(t), y'(t), \cdots, y^{(n-1)}(t)) = 0.
 \end{equation}
-Stiff ODEs are a kind of problem which is very hard to solve by most explicit
-numerical methods, however, they can be solved by implicit methods like the
+While stiff ODEs are a kind of problem which is very hard to solve by most
+explicit numerical methods, they can be solved by implicit methods like the
 family of Rosenbrock methods, implicit Runge-Kutta methods or backward
-differentiation formulae (BDF) without struggle. The problem is that the
-methods which are good for stiff ODEs are not fast, as they have to solve for
+differentiation formulae (BDF) without any issue. The problem is that the
+methods which work well for stiff ODEs are not fast, as they have to solve for
 non-linear or linear systems in each time step. Yet, most stiff problems are
-not stiff throughout the whole domain of interest. This leads to the
-motivation of my first project, \textit{stiffness detection and automatic
-switching algorithms}. Conventionally, one uses only a single algorithm to
-solve for the entire domain of interest. Thus, one is forced to use a stiff
-algorithm, although there is only a very small interval in the domain that is
-stiff. The auto-switching algorithm can solve this dilemma and raise the
-efficiency of solving ODEs, because stiff algorithms will only be applied to
-the stiff part of the domain, and non-stiff algorithms will solve the rest of
-the problem quickly. This project is beneficial for most people who use the
+not stiff throughout the whole domain of interest. This leads to the motivation
+of my first project, \textit{stiffness detection and automatic switching
+algorithms}. Conventionally, one uses only a single algorithm to solve for the
+entire domain of interest. Thus, one is forced to use a stiff algorithm,
+although there is only a very small interval in the domain that is stiff. The
+auto-switching algorithm can solve this dilemma and raise the efficiency of
+solving ODEs, because stiff algorithms will only be applied to the stiff part
+of the domain, and non-stiff algorithms will solve the rest of the problem
+quickly. This project is beneficial for most people who use the
 \textit{JuliaDiffEq} ecosystem, because it removes the burden of having to test
 multiple algorithms for one problem and chose the more efficient one. It can
-also help to save much computation time for huge ODE systems, e.g. time
-stepping of a PDE discretization.
+also help to save computation time for ODE systems, e.g. time stepping of a PDE
+discretization.
 
 \subsubsection{Implementation Details}
 Higham and Trefethen~\cite{stiffode} pointed out that an ODE system is stiff
-when the pseudospectrum of its $J$ has big radii while it has a small abscissa,
+when the pseudospectrum of its $J$ has large radii while it has a small abscissa,
 where $J$ denotes a Jacobian matrix. Computing the pseudospectra of a linear
 operator is very costly, so in practice, it makes sense to only calculate the norm
 or the approximated largest eigenvalue of $J$.
@@ -148,10 +148,10 @@ Dormand-Prince and Tsitouras $5/4$ pairs, there is the relation $c_6 = c_7 =
   \varrho = \frac{\norm{k_7-k_6}}{\norm{g_7-k_6}}\qqtext{where } k_i = f(g_i,
   t_0 + c_i\cdot \Delta t)
 \end{equation}
-to produce a decent approximation of the most significant eigenvalue.
+to produce a reasonable approximation of the most significant eigenvalue.
 Naturally, one can classify a problem to be stiff when $\Delta
 t\cdot\varrho/S \ll 1$. Where $S$ is the width of the stability domain of the
-Runge-Kutta algorithm. Currently, the implementation reads
+Runge-Kutta algorithm. Currently, the implementation reads:
 
 \begin{lstlisting}
 g6 = uprev+dt*(a61*k1+a62*k2+a63*k3+a64*k4+a65*k5)
@@ -162,9 +162,9 @@ rho = integrator.opts.internalnorm(k7 - k6)/
 stiffness = rho*dt/3.3
 \end{lstlisting}
 
-and here is a demonstration of this automatic stiffness detection method with
-the infamous Dormand-Prince $5/4$ integrator. The ODEs that the integrator
-solves are
+Here is a demonstration of this automatic stiffness detection method with the
+infamous Dormand-Prince $5/4$ integrator. The ODEs that the integrator solves
+are
 \begin{align}
   y'_1 &= y_2\\
   y'_2 &= ((1-y_1^2)y_2-y_1) / \varepsilon
@@ -191,10 +191,11 @@ Switching algorithm can be done by the \texttt{CompositeAlgorithm} type. It has
 an API of \texttt{CompositeAlgorithm(algtup,choice\_function)}, where
 \texttt{algtup} is a tuple of algorithms, and \texttt{choice\_function} is the
 switching strategy. Thus, I can implement the switching algorithm by imposing a
-strategy which dependents on the stiffness, e.g. switch to \texttt{Rodas5} (a
-5th order A-stable stiffly stable Rosenbrock method) after hitting 15
-successive stiff test positives from \texttt{DP5} or \texttt{Tsit5} and switch
-back to explicit Runge-Kutta after receiving 15 successive stiff test negative.
+strategy which depends on the stiffness, e.g. the algorithm switches to
+\texttt{Rodas5} (a 5th order A-stable stiffly stable Rosenbrock method) after
+hitting 15 successive stiff test positives from \texttt{DP5} or \texttt{Tsit5}
+and switches back to explicit Runge-Kutta after receiving 15 successive stiff
+test negative.
 
 \subsection{Goal 2: Tooling for \texttt{ModelingToolkit.jl}}
 % You should explain more ModelingToolkit.jl tooling
@@ -206,15 +207,15 @@ back to explicit Runge-Kutta after receiving 15 successive stiff test negative.
 \texttt{ModelingToolkit.jl}~\cite{modelingtoolkit} is an intermediate
 representation (IR) of computational graphs for scientific computing problems.
 Every domain specific language (DSL) has a stage of lowering expressions into a
-form of intermediate representation. The gist of \texttt{ModelingToolkit.jl} is
-that it is a compiler for scientific computing DSLs. My second goal during this
-GSoC project is to implement expression parsing tools and utilities for IR
-manipulation in the repository. For instance, currently, this package assumes
-that the term with the highest order of differentiation is on the left hand
-side of the equation, but it might not be true. Hence, a sorting transformation
-is necessary to canonicalize a system of differential equations. Another
-example of tooling is that the user Borisov~\cite{parsing} requested an
-expression parsing tool of the following form.
+form of intermediate representation. \texttt{ModelingToolkit.jl} is a compiler
+for scientific computing DSLs. My second goal during this GSoC project is to
+implement expression parsing tools and utilities for IR manipulation in the
+repository. For instance, currently, this package assumes that the term with
+the highest order of differentiation is on the left hand side of the equation,
+but it might not be true. Hence, a sorting transformation is necessary to
+canonicalize a system of differential equations. Another example of tooling is
+that the user Borisov~\cite{parsing} requested an expression parsing tool of
+the following form.
 \begin{lstlisting}
 ex = quote
     v1 = k1*A*comp1
@@ -227,7 +228,7 @@ depend_vars = (:A, :B)
 
 \subsection{Goal 3: Implement DAE index reduction algorithms}
 My third goal is to implement index reduction algorithms for differential
-algebraic equations (DAEs). DAEs are raised naturally from Euler-Lagrange
+algebraic equations (DAEs). DAEs arise naturally from Euler-Lagrange
 equations with constraints and many modeling problems, and its general form is
 \begin{equation}
   F(t, \vec{x}, \frac{d\vec{x}}{dt}) = \vec{0}.
@@ -246,9 +247,9 @@ Hessenberg index-2 forms,
     0 &= g_i(t,y)
   \end{dcases}
 \end{align}
-so one has to reduce the index of the DAE to index-1 or index-2 form. However,
-it is difficult and cumbersome to reduce the indices of a DAE system by hand.
-The \texttt{ModelingToolkit.jl} package has enough information about a DAE system,
+so one has to reduce the index of the DAE to index-1 or index-2 form. Yet, it
+is difficult and cumbersome to reduce the indices of a DAE system by hand. The
+\texttt{ModelingToolkit.jl} package has enough information about a DAE system,
 because it has its own computational graph of the system. This project benefits
 people who work on modelings and dynamical systems when the solutions' local
 coordinates are complicated and not trivial to convert to.
@@ -270,25 +271,26 @@ coordinates are complicated and not trivial to convert to.
 % a clean API that's simplified and accessible, and documenting it in a minimal
 % way.
 
-The potential hurdles with the \texttt{ModelingToolkit.jl} part is trying to
-find out a clean API that is simplified and accessible, and documenting it in a
-minimal way. I believe that I can overcome this hurdle by learning from my
-potential mentors'--- Jiahao and Chris'---suggestions. For instance, when I was
-implementing the order reduction algorithm for systems of ODEs, Chris taught me
-that this kind of algorithms should be implemented as a transformation that is
+The \texttt{ModelingToolkit.jl} portion presents a specific hurdle. It may be
+tedious determining a clean way to implement API that is simple, accessible and
+that requires minimal documentation. I believe that I can overcome this hurdle
+by learning from my potential mentors'--- Jiahao and Chris'---suggestions. For
+instance, when I was implementing the order reduction algorithm for systems of
+ODEs, Chris taught me that this kind of algorithms should be implemented as a
+transformation that is
 \begin{equation}\label{eq:map}
   f: \texttt{DiffEqSystem}\mapsto \texttt{DiffEqSystem},
 \end{equation}
 so that it fits into the design of the \texttt{ModelingToolkit.jl} package, and
 makes it more flexible and extendible~\cite{i49}. Such design choice helps to
-make a clear API, because it is much cleaner to list all the functions which have
-the map~(\ref{eq:map}) then it is to have a whole load of functions that act on
-different objects in the documentation.
+make a clear API. It is much cleaner to list all the functions which have the
+map~(\ref{eq:map}) then it is to have numerous functions that act on different
+objects in the documentation.
 
-I also might have struggle to use \texttt{Git}. I have messed up a pull request
-by a bad \texttt{git rebase}. However, I am confident that I can subdue this
-problem by being extra careful when I merge or rebase in a \texttt{Git}
-repository.
+In addition, I may also struggle to use \texttt{Git}. In the past, I have
+accidentally messed up a pull request by a bad \texttt{git rebase} command.
+However, I am confident that I can subdue this problem by being extra careful
+when I merge or rebase in a \texttt{Git} repository.
 
 \subsection{Potential Mentors}
 Jiahao Chen (\texttt{@jiahao}) is going to be my primary mentor, and
@@ -296,21 +298,20 @@ Christopher Rackauckas (\texttt{@ChrisRackauckas}) is going to my secondary
 mentor.
 
 \section{Milestones}
-There are many different aspects of a coding project like features, API
-usability and documentations. I will prioritize the robustness aspect over
-everything else in the beginning of the GSoC project, since the correctness is
-very critical for numerical analysis softwares. I will achieve robustness by
-adding extensive tests and benchmarks for all of my pull requests. I will shift
-my attention to API usability after I finish all the features, as a software
-must be friendly to the users to gain popularity. After I stabilize the API, I
-will move my focus to documentations. I will not only write the standard
-documentations in \url{http://docs.juliadiffeq.org/latest/}, but also more
-tutorials in the \texttt{DiffEqTutorials.jl} repository. Here is my tentative
-plan for the GSoC project.
+There are several aspects of my project I need to consider such as features,
+API usability and documentation. I will initially prioritize robustness over
+everything else, as accuracy and reliablilty is critical in numerical analysis
+software. I will achieve robustness by adding extensive tests and benchmarks
+for all of my pull requests. I will then shift my attention to API usability,
+as it is also important for software to be user-friendly. After I stabilize the
+API, I will move my focus to documentation. I will provide the standard
+documentation at \url{http://docs.juliadiffeq.org/latest/}, and will also
+include tutorials in the \texttt{DiffEqTutorials.jl} repository. Here is my
+tentative plan for the GSoC project.
 
 \paragraph{Community Bonding: April 5 --- May 14}
-I am going to read more literature about the stiffness of ODEs, and discuss
-many possible implementations for my mentors.
+I will read more literature regarding stiffness, and discuss possible
+implementations with my mentors.
 
 \paragraph{First Milestone --- Stiffness Detection Algorithms: May 14 --- June
 11}
@@ -326,7 +327,7 @@ clean up the code that I have produced during the last period.
 \paragraph{Second Milestone --- \texttt{ModelingToolkit.jl} IR Tooling: June 15
 --- July 9}
 I will turn my focus to the \texttt{ModelingToolkit.jl} repository at this
-stage, but I will still try to optimize the methods switching strategy that is
+stage, but I will still try to optimize the methods switching strategy that was
 completed in the previous milestone. I will also fix some bugs in the strategy
 and the algorithms, since after stiffness detection and automatic switching
 algorithms are tagged in the \texttt{OrdinaryDiffEq.jl} repository, users will
@@ -398,14 +399,15 @@ Runge-Kutta-Nystr{\"o}m methods and symplectic integrators.
 \end{itemize}
 
 \subsection{Contact Information}
-\paragraph{Email:} yingbom@uci.com
+\paragraph{Email:} yingbom@uci.edu
 \paragraph{GitHub:} YingboMa
 
 \section{Summer Logistics}
-I expect to be able to work over 30 hours per week throughout the summer. I do
-not have any summer courses nor other jobs, so I can put most of my attention
-to this GSoC project. Overall, I will be able to put 350-400 hours into this
-project. If possible I plan to visit MIT Julia Lab during this GSoC project.
+I expect to be able to work over 30 hours per week throughout the summer. I
+neither have any summer courses nor other jobs, so I can put most of my
+attention to this GSoC project. Overall, I will be able to put 350-400 hours
+into this project. If possible I plan to visit MIT Julia Lab during this GSoC
+project.
 
 \bibliography{cite}
 \end{document}
